@@ -1,0 +1,237 @@
+hydra:
+  run:
+    dir: outputs/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: multirun/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    subdir: ${hydra.job.num}
+  launcher:
+    _target_: hydra._internal.core_plugins.basic_launcher.BasicLauncher
+  sweeper:
+    _target_: hydra._internal.core_plugins.basic_sweeper.BasicSweeper
+    max_batch_size: null
+    params: null
+  help:
+    app_name: ${hydra.job.name}
+    header: '${hydra.help.app_name} is powered by Hydra.
+
+      '
+    footer: 'Powered by Hydra (https://hydra.cc)
+
+      Use --hydra-help to view Hydra specific help
+
+      '
+    template: '${hydra.help.header}
+
+      == Configuration groups ==
+
+      Compose your configuration from those groups (group=option)
+
+
+      $APP_CONFIG_GROUPS
+
+
+      == Config ==
+
+      Override anything in the config (foo.bar=value)
+
+
+      $CONFIG
+
+
+      ${hydra.help.footer}
+
+      '
+  hydra_help:
+    template: 'Hydra (${hydra.runtime.version})
+
+      See https://hydra.cc for more info.
+
+
+      == Flags ==
+
+      $FLAGS_HELP
+
+
+      == Configuration groups ==
+
+      Compose your configuration from those groups (For example, append hydra/job_logging=disabled
+      to command line)
+
+
+      $HYDRA_CONFIG_GROUPS
+
+
+      Use ''--cfg hydra'' to Show the Hydra config.
+
+      '
+    hydra_help: ???
+  hydra_logging:
+    version: 1
+    formatters:
+      simple:
+        format: '[%(asctime)s][HYDRA] %(message)s'
+    handlers:
+      console:
+        class: logging.StreamHandler
+        formatter: simple
+        stream: ext://sys.stdout
+    root:
+      level: INFO
+      handlers:
+      - console
+    loggers:
+      logging_example:
+        level: DEBUG
+    disable_existing_loggers: false
+  job_logging:
+    version: 1
+    formatters:
+      simple:
+        format: '[%(asctime)s][%(name)s][%(levelname)s] - %(message)s'
+    handlers:
+      console:
+        class: logging.StreamHandler
+        formatter: simple
+        stream: ext://sys.stdout
+      file:
+        class: logging.FileHandler
+        formatter: simple
+        filename: ${hydra.runtime.output_dir}/${hydra.job.name}.log
+    root:
+      level: INFO
+      handlers:
+      - console
+      - file
+    disable_existing_loggers: false
+  env: {}
+  mode: RUN
+  searchpath:
+  - file://verl/trainer/config
+  callbacks: {}
+  output_subdir: .hydra
+  overrides:
+    hydra:
+    - hydra.mode=RUN
+    task:
+    - data.train_files=/root/autodl-tmp/data/verl-agent/text/train.parquet
+    - data.val_files=/root/autodl-tmp/data/verl-agent/text/test.parquet
+    - data.train_batch_size=8
+    - data.val_batch_size=16
+    - data.max_prompt_length=2048
+    - data.max_response_length=512
+    - data.filter_overlong_prompts=True
+    - data.truncation=error
+    - data.return_raw_chat=True
+    - +data.dataloader_num_workers=0
+    - actor_rollout_ref.model.path=/root/autodl-tmp/models/Qwen2.5-1.5B-Instruct
+    - actor_rollout_ref.actor.optim.lr=1e-6
+    - actor_rollout_ref.model.use_remove_padding=True
+    - actor_rollout_ref.actor.ppo_mini_batch_size=256
+    - actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=32
+    - actor_rollout_ref.actor.use_kl_loss=False
+    - actor_rollout_ref.model.enable_gradient_checkpointing=True
+    - actor_rollout_ref.actor.fsdp_config.param_offload=False
+    - actor_rollout_ref.actor.fsdp_config.optimizer_offload=False
+    - actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=32
+    - actor_rollout_ref.rollout.tensor_model_parallel_size=1
+    - actor_rollout_ref.rollout.name=vllm
+    - actor_rollout_ref.rollout.gpu_memory_utilization=0.6
+    - actor_rollout_ref.rollout.enable_chunked_prefill=False
+    - actor_rollout_ref.rollout.enforce_eager=False
+    - actor_rollout_ref.rollout.free_cache_engine=False
+    - actor_rollout_ref.rollout.val_kwargs.temperature=0.4
+    - actor_rollout_ref.rollout.val_kwargs.do_sample=True
+    - actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=32
+    - actor_rollout_ref.ref.fsdp_config.param_offload=True
+    - actor_rollout_ref.actor.use_invalid_action_penalty=False
+    - algorithm.use_kl_in_reward=True
+    - algorithm.kl_coef=0.01
+    - algorithm.hspo.abg_min_group_size=2
+    - algorithm.hspo.abg_target_size=4
+    - algorithm.hspo.abg_max_branch=4
+    - algorithm.hspo.abg_step_cost=-0.1
+    - algorithm.hspo.abg_completion_bonus=2.0
+    - algorithm.hspo.low_clip_epsilon=0.2
+    - algorithm.hspo.low_beta=0.01
+    - algorithm.hspo.high_gamma=0.99
+    - algorithm.hspo.high_lam=0.95
+    - algorithm.hspo.high_clip_epsilon=0.2
+    - algorithm.hspo.high_beta=0.01
+    - algorithm.hspo.switch_alpha=0.5
+    - algorithm.hspo.alpha_t=0.5
+    - algorithm.hspo.alpha_l=1.0
+    - algorithm.hspo.alpha_h=1.0
+    - algorithm.hspo.alpha_sft=0.1
+    - algorithm.hspo.norm_adv=True
+    - algorithm.hspo.warmup_epochs=10
+    - algorithm.hspo.executor_epochs=100
+    - env.env_name=alfworld/AlfredTWEnvOptions
+    - env.seed=0
+    - env.max_steps=50
+    - env.rollout.n=4
+    - env.resources_per_worker.num_cpus=0.25
+    - trainer.critic_warmup=0
+    - trainer.logger=['console','wandb']
+    - trainer.project_name=verl_agent_alfworld
+    - trainer.experiment_name=hspo_qwen2.5_1.5b
+    - trainer.n_gpus_per_node=1
+    - trainer.nnodes=1
+    - trainer.save_freq=25
+    - trainer.test_freq=5
+    - trainer.total_epochs=200
+    - trainer.val_before_train=False
+    - trainer.default_local_dir=/root/autodl-tmp/checkpoints/verl_agent_alfworld/hspo_qwen2.5_1.5b
+    - trainer.max_actor_ckpt_to_keep=2
+    - trainer.max_critic_ckpt_to_keep=2
+    - ray_init.num_cpus=16
+    - +ray_init._temp_dir=/root/autodl-tmp/ray_tmp
+    - algorithm.hspo.warmup_epochs=0
+    - algorithm.hspo.executor_epochs=0
+    - trainer.total_epochs=3
+    - actor_rollout_ref.rollout.name=hf
+    - algorithm.use_kl_in_reward=False
+    - actor_rollout_ref.actor.use_kl_loss=False
+    - trainer.logger=['console']
+  job:
+    name: main_hspo
+    chdir: null
+    override_dirname: +data.dataloader_num_workers=0,+ray_init._temp_dir=/root/autodl-tmp/ray_tmp,actor_rollout_ref.actor.fsdp_config.optimizer_offload=False,actor_rollout_ref.actor.fsdp_config.param_offload=False,actor_rollout_ref.actor.optim.lr=1e-6,actor_rollout_ref.actor.ppo_micro_batch_size_per_gpu=32,actor_rollout_ref.actor.ppo_mini_batch_size=256,actor_rollout_ref.actor.use_invalid_action_penalty=False,actor_rollout_ref.actor.use_kl_loss=False,actor_rollout_ref.actor.use_kl_loss=False,actor_rollout_ref.model.enable_gradient_checkpointing=True,actor_rollout_ref.model.path=/root/autodl-tmp/models/Qwen2.5-1.5B-Instruct,actor_rollout_ref.model.use_remove_padding=True,actor_rollout_ref.ref.fsdp_config.param_offload=True,actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=32,actor_rollout_ref.rollout.enable_chunked_prefill=False,actor_rollout_ref.rollout.enforce_eager=False,actor_rollout_ref.rollout.free_cache_engine=False,actor_rollout_ref.rollout.gpu_memory_utilization=0.6,actor_rollout_ref.rollout.log_prob_micro_batch_size_per_gpu=32,actor_rollout_ref.rollout.name=hf,actor_rollout_ref.rollout.name=vllm,actor_rollout_ref.rollout.tensor_model_parallel_size=1,actor_rollout_ref.rollout.val_kwargs.do_sample=True,actor_rollout_ref.rollout.val_kwargs.temperature=0.4,algorithm.hspo.abg_completion_bonus=2.0,algorithm.hspo.abg_max_branch=4,algorithm.hspo.abg_min_group_size=2,algorithm.hspo.abg_step_cost=-0.1,algorithm.hspo.abg_target_size=4,algorithm.hspo.alpha_h=1.0,algorithm.hspo.alpha_l=1.0,algorithm.hspo.alpha_sft=0.1,algorithm.hspo.alpha_t=0.5,algorithm.hspo.executor_epochs=0,algorithm.hspo.executor_epochs=100,algorithm.hspo.high_beta=0.01,algorithm.hspo.high_clip_epsilon=0.2,algorithm.hspo.high_gamma=0.99,algorithm.hspo.high_lam=0.95,algorithm.hspo.low_beta=0.01,algorithm.hspo.low_clip_epsilon=0.2,algorithm.hspo.norm_adv=True,algorithm.hspo.switch_alpha=0.5,algorithm.hspo.warmup_epochs=0,algorithm.hspo.warmup_epochs=10,algorithm.kl_coef=0.01,algorithm.use_kl_in_reward=False,algorithm.use_kl_in_reward=True,data.filter_overlong_prompts=True,data.max_prompt_length=2048,data.max_response_length=512,data.return_raw_chat=True,data.train_batch_size=8,data.train_files=/root/autodl-tmp/data/verl-agent/text/train.parquet,data.truncation=error,data.val_batch_size=16,data.val_files=/root/autodl-tmp/data/verl-agent/text/test.parquet,env.env_name=alfworld/AlfredTWEnvOptions,env.max_steps=50,env.resources_per_worker.num_cpus=0.25,env.rollout.n=4,env.seed=0,ray_init.num_cpus=16,trainer.critic_warmup=0,trainer.default_local_dir=/root/autodl-tmp/checkpoints/verl_agent_alfworld/hspo_qwen2.5_1.5b,trainer.experiment_name=hspo_qwen2.5_1.5b,trainer.logger=['console','wandb'],trainer.logger=['console'],trainer.max_actor_ckpt_to_keep=2,trainer.max_critic_ckpt_to_keep=2,trainer.n_gpus_per_node=1,trainer.nnodes=1,trainer.project_name=verl_agent_alfworld,trainer.save_freq=25,trainer.test_freq=5,trainer.total_epochs=200,trainer.total_epochs=3,trainer.val_before_train=False
+    id: ???
+    num: ???
+    config_name: hspo_trainer
+    env_set: {}
+    env_copy: []
+    config:
+      override_dirname:
+        kv_sep: '='
+        item_sep: ','
+        exclude_keys: []
+  runtime:
+    version: 1.3.2
+    version_base: '1.3'
+    cwd: /root/projects/HSPO/HSPO-agent
+    config_sources:
+    - path: hydra.conf
+      schema: pkg
+      provider: hydra
+    - path: /root/projects/HSPO/HSPO-agent/recipe/hspo/config
+      schema: file
+      provider: main
+    - path: verl/trainer/config
+      schema: file
+      provider: hydra.searchpath in main
+    - path: ''
+      schema: structured
+      provider: schema
+    output_dir: /root/projects/HSPO/HSPO-agent/outputs/2026-05-06/07-40-34
+    choices:
+      hydra/env: default
+      hydra/callbacks: null
+      hydra/job_logging: default
+      hydra/hydra_logging: default
+      hydra/hydra_help: default
+      hydra/help: default
+      hydra/sweeper: basic
+      hydra/launcher: basic
+      hydra/output: default
+  verbose: false

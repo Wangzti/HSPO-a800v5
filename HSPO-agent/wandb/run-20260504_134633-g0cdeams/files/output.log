@@ -1,0 +1,16 @@
+wandb: Detected [openai] in use.
+wandb: Use W&B Weave for improved LLM call tracing. Install Weave with `pip install weave` then add `import weave` to the top of your script.
+wandb: For more information, check out the docs at: https://weave-docs.wandb.ai
+Using LocalLogger is deprecated. The constructor API will change
+Found checkpoint: %s /root/autodl-tmp/checkpoints/verl_agent_alfworld/gigpo_qwen2.5_1.5b/global_step_70
+Load from checkpoint folder: /root/autodl-tmp/checkpoints/verl_agent_alfworld/gigpo_qwen2.5_1.5b/global_step_70
+Setting global step to 70
+Resuming from /root/autodl-tmp/checkpoints/verl_agent_alfworld/gigpo_qwen2.5_1.5b/global_step_70
+Warning: No dataloader state found at /root/autodl-tmp/checkpoints/verl_agent_alfworld/gigpo_qwen2.5_1.5b/global_step_70/data.pt, will start from scratch
+Training Progress:  14%|█▍        | 71/500 [04:01<28:43:44, 241.08s/it]
+list(reward_extra_infos_dict.keys())=[]
+Avg size of step-level group: 4.01223241590214
+step:71 - global_seqlen/min:833533.000 - global_seqlen/max:833533.000 - global_seqlen/minmax_diff:0.000 - global_seqlen/balanced_min:833533.000 - global_seqlen/balanced_max:833533.000 - global_seqlen/mean:833533.000 - actor/entropy_loss:0.992 - training/rollout_probs_diff_max:0.173 - training/rollout_probs_diff_mean:0.005 - training/rollout_probs_diff_std:0.008 - episode/valid_action_ratio:0.998 - actor/kl_loss:0.045 - actor/kl_coef:0.010 - actor/pg_loss:-0.002 - actor/pg_clipfrac:0.001 - actor/ppo_kl:-0.000 - actor/pg_clipfrac_lower:0.000 - actor/grad_norm:0.926 - perf/mfu/actor:0.457 - perf/max_memory_allocated_gb:91.045 - perf/max_memory_reserved_gb:110.662 - perf/cpu_memory_used_gb:138.031 - actor/lr:0.000 - training/global_step:71.000 - training/epoch:0.000 - critic/score/mean:1.578 - critic/score/max:10.000 - critic/score/min:-0.100 - critic/rewards/mean:1.578 - critic/rewards/max:10.000 - critic/rewards/min:-0.100 - critic/advantages/mean:0.002 - critic/advantages/max:5.154 - critic/advantages/min:-2.765 - critic/returns/mean:0.002 - critic/returns/max:5.154 - critic/returns/min:-2.765 - response_length/mean:92.939 - response_length/max:319.000 - response_length/min:31.000 - response_length/clip_ratio:0.000 - prompt_length/mean:542.376 - prompt_length/max:1052.000 - prompt_length/min:341.000 - prompt_length/clip_ratio:0.000 - episode/reward/mean:3.125 - episode/reward/max:10.000 - episode/reward/min:0.000 - episode/length/mean:40.844 - episode/length/max:50.000 - episode/length/min:5.000 - episode/tool_call_count/mean:0.000 - episode/success_rate:0.312 - episode/pick_heat_then_place_in_recep_success_rate:0.417 - episode/pick_clean_then_place_in_recep_success_rate:0.000 - episode/pick_two_obj_and_place_success_rate:0.083 - episode/pick_and_place_success_rate:1.000 - timing_s/gen:133.035 - timing_s/reward:0.309 - timing_s/old_log_prob:18.158 - timing_s/ref:24.239 - timing_s/adv:0.252 - timing_s/update_actor:64.844 - timing_s/step:241.006 - timing_per_token_ms/ref:0.029 - timing_per_token_ms/adv:0.000 - timing_per_token_ms/update_actor:0.078 - timing_per_token_ms/gen:1.091 - perf/total_num_tokens:833533.000 - perf/time_per_step:241.006 - perf/throughput:3458.564
+list(reward_extra_infos_dict.keys())=[]
+Avg size of step-level group: 4.7368421052631575
+step:72 - global_seql

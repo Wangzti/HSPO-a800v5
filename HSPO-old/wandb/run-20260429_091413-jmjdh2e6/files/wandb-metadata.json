@@ -1,0 +1,64 @@
+{
+  "os": "Linux-5.15.0-139-generic-x86_64-with-glibc2.31",
+  "python": "CPython 3.12.0",
+  "startedAt": "2026-04-29T01:14:13.823889Z",
+  "args": [
+    "data.train_files=/mnt/nfs/ztwang/data/hspo/sft/alfworld_sft/train_format.parquet",
+    "data.val_files=/mnt/nfs/ztwang/data/hspo/sft/alfworld_sft/val_format.parquet",
+    "data.train_batch_size=64",
+    "data.micro_batch_size_per_gpu=2",
+    "data.max_length=12288",
+    "data.truncation=right",
+    "data.multiturn.enable=true",
+    "data.multiturn.messages_key=messages",
+    "model.partial_pretrain=/mnt/nfs/ztwang/models/Qwen2.5-1.5B-Instruct",
+    "+model.torch_dtype=bfloat16",
+    "model.enable_gradient_checkpointing=true",
+    "model.fsdp_config.cpu_offload=false",
+    "model.trust_remote_code=false",
+    "ulysses_sequence_parallel_size=1",
+    "+actor_rollout_ref.model.override_config.attn_implementation=flash_attention_2",
+    "optim.lr=2e-5",
+    "optim.warmup_steps_ratio=0.05",
+    "optim.clip_grad=1.0",
+    "trainer.total_epochs=2",
+    "trainer.default_local_dir=/mnt/nfs/ztwang/checkpoints/hspo/sft/alfworld_qwen2.5_1.5b_instruct_step1_format",
+    "trainer.project_name=hspo_sft",
+    "trainer.experiment_name=alfworld_format_qwen2.5_1.5b",
+    "trainer.logger=[\"console\",\"wandb\"]",
+    "trainer.seed=42"
+  ],
+  "program": "-m verl.trainer.fsdp_sft_trainer",
+  "git": {
+    "remote": "git@github.com:Wangzti/HSPO.git",
+    "commit": "dd595411bff9dd5deea8d08b83af3eadc73d73b2"
+  },
+  "email": "2503193821@qq.com",
+  "root": "/mnt/nfs/ztwang/projects/demos/HSPO/HSPO-agent",
+  "host": "softengine-KVM",
+  "executable": "/mnt/nfs/ztwang/conda_envs/verl/bin/python3.12",
+  "cpu_count": 48,
+  "cpu_count_logical": 48,
+  "gpu": "NVIDIA H800 PCIe",
+  "gpu_count": 1,
+  "disk": {
+    "/": {
+      "total": "209709965312",
+      "used": "196638363648"
+    }
+  },
+  "memory": {
+    "total": "270246432768"
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA H800 PCIe",
+      "memoryTotal": "85520809984",
+      "cudaCores": 14592,
+      "architecture": "Hopper",
+      "uuid": "GPU-cd690150-56ff-7f55-0336-aa815b2d5629"
+    }
+  ],
+  "cudaVersion": "12.9",
+  "writerId": "shhnr6lmefd41687e80cwy6fzfehy6ay"
+}

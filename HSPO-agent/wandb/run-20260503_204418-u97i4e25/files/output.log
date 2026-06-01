@@ -1,0 +1,103 @@
+wandb: Detected [openai] in use.
+wandb: Use W&B Weave for improved LLM call tracing. Install Weave with `pip install weave` then add `import weave` to the top of your script.
+wandb: For more information, check out the docs at: https://weave-docs.wandb.ai
+Using LocalLogger is deprecated. The constructor API will change
+Checkpoint tracker file does not exist: %s /root/projects/HSPO/verl-agent/checkpoints/verl_agent_alfworld/gigpo_qwen2.5_1.5b/latest_checkpointed_iteration.txt
+Training from scratch
+test_gen_batch meta info: {'eos_token_id': 151645, 'pad_token_id': 151643, 'recompute_log_prob': False, 'do_sample': True, 'validate': True}
+validation generation end
+[text][prompt] <|im_start|>system
+You are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>
+<|im_start|>user
+
+You are an expert agent operating in the ALFRED Embodied Environment. Your task is to: heat some tomato and put it in diningtable.
+Prior to this step, you have already taken 11 step(s). Below are the most recent 2 observations and the corresponding actions you took: [Observation 10: 'You close the fridge 1.', Action 10: 'heat tomato 3 with stoveburner 1']
+[Observation 11: 'Nothing happens.', Action 11: 'heat tomato 3 with stoveburner 1']
+You are now at step 12 and your current observation is: Nothing happens.
+Your admissible actions of the current situation are: ['cool tomato 3 with fridge 1'
+ 'examine fridge 1'
+ 'examine tomato 3'
+ 'go to cabinet 1'
+ 'go to cabinet 10'
+ 'go to cabinet 11'
+ 'go to cabinet 12'
+ 'go to cabinet 13'
+ 'go to cabinet 14'
+ 'go to cabinet 15'
+ 'go to cabinet 16'
+ 'go to cabinet 17'
+ 'go to cabinet 18'
+ 'go to cabinet 19'
+ 'go to cabinet 2'
+ 'go to cabinet 20'
+ 'go to cabinet 21'
+ 'go to cabinet 22'
+ 'go to cabinet 23'
+ 'go to cabinet 24'
+ 'go to cabinet 25'
+ 'go to cabinet 26'
+ 'go to cabinet 27'
+ 'go to cabinet 3'
+ 'go to cabinet 4'
+ 'go to cabinet 5'
+ 'go to cabinet 6'
+ 'go to cabinet 7'
+ 'go to cabinet 8'
+ 'go to cabinet 9'
+ 'go to coffeemachine 1'
+ 'go to countertop 1'
+ 'go to countertop 2'
+ 'go to diningtable 1'
+ 'go to drawer 1'
+ 'go to drawer 10'
+ 'go to drawer 11'
+ 'go to drawer 12'
+ 'go to drawer 2'
+ 'go to drawer 3'
+ 'go to drawer 4'
+ 'go to drawer 5'
+ 'go to drawer 6'
+ 'go to drawer 7'
+ 'go to drawer 8'
+ 'go to drawer 9'
+ 'go to garbagecan 1'
+ 'go to microwave 1'
+ 'go to sinkbasin 1'
+ 'go to stoveburner 1'
+ 'go to stoveburner 2'
+ 'go to stoveburner 3'
+ 'go to stoveburner 4'
+ 'go to toaster 1'
+ 'inventory'
+ 'look'
+ 'open fridge 1'].
+
+Now it's your turn to take an action.
+You should first reason step-by-step about the current situation. This reasoning process MUST be enclosed within <think> </think> tags.
+Once you've finished your reasoning, you should choose an admissible action for current step and present it within <action> </action> tags.
+<|im_end|>
+<|im_start|>assistant
+
+[text][response] <think>
+The previous actions were to heat the tomato with the stove burner 1, but nothing happened. This suggests that there might be an issue with the stove burner or the tomato. The fridge and other kitchen appliances have already been checked, so the problem might be with the stove burner or the tomato itself.
+</think>
+
+<action>heat tomato 3 with stoveburner 1</action><|im_end|>
+[text][score] 0.0
+("Initial validation metrics: {'val/text/test_score': "
+ "np.float64(0.14465108885709743), 'val/text/tool_call_count/mean': "
+ "np.float64(0.0), 'val/success_rate': np.float64(0.03125), "
+ "'val/pick_heat_then_place_in_recep_success_rate': np.float64(0.0), "
+ "'val/pick_cool_then_place_in_recep_success_rate': np.float64(0.0), "
+ "'val/pick_clean_then_place_in_recep_success_rate': np.float64(0.04), "
+ "'val/pick_two_obj_and_place_success_rate': np.float64(0.0), "
+ "'val/pick_and_place_success_rate': np.float64(0.07142857142857142), "
+ "'val/look_at_obj_in_light_success_rate': np.float64(0.08333333333333333)}")
+step:0 - val/text/test_score:0.145 - val/text/tool_call_count/mean:0.000 - val/success_rate:0.031 - val/pick_heat_then_place_in_recep_success_rate:0.000 - val/pick_cool_then_place_in_recep_success_rate:0.000 - val/pick_clean_then_place_in_recep_success_rate:0.040 - val/pick_two_obj_and_place_success_rate:0.000 - val/pick_and_place_success_rate:0.071 - val/look_at_obj_in_light_success_rate:0.083
+Training Progress:   0%|          | 2/2400 [09:34<189:48:37, 284.95s/it]
+list(reward_extra_infos_dict.keys())=[]
+Avg size of step-level group: 5.633802816901408
+step:1 - global_seqlen/min:991336.000 - global_seqlen/max:991336.000 - global_seqlen/minmax_diff:0.000 - global_seqlen/balanced_min:991336.000 - global_seqlen/balanced_max:991336.000 - global_seqlen/mean:991336.000 - actor/entropy_loss:1.110 - training/rollout_probs_diff_max:0.192 - training/rollout_probs_diff_mean:0.006 - training/rollout_probs_diff_std:0.010 - episode/valid_action_ratio:0.839 - actor/kl_loss:0.007 - actor/kl_coef:0.010 - actor/pg_loss:-0.053 - actor/pg_clipfrac:0.006 - actor/ppo_kl:0.001 - actor/pg_clipfrac_lower:0.000 - actor/grad_norm:3.668 - perf/mfu/actor:0.449 - perf/max_memory_allocated_gb:99.831 - perf/max_memory_reserved_gb:115.842 - perf/cpu_memory_used_gb:143.583 - actor/lr:0.000 - training/global_step:1.000 - training/epoch:0.000 - critic/score/mean:0.503 - critic/score/max:10.000 - critic/score/min:-0.100 - critic/rewards/mean:0.503 - critic/rewards/max:10.000 - critic/rewards/min:-0.100 - critic/advantages/mean:0.066 - critic/advantages/max:6.257 - critic/advantages/min:-6.062 - critic/returns/mean:0.066 - critic/returns/max:6.257 - critic/returns/min:-6.062 - response_length/mean:96.175 - response_length/max:512.000 - response_length/min:19.000 - response_length/clip_ratio:0.001 - prompt_length/mean:523.410 - prompt_length/max:1055.000 - prompt_length/min:340.000 - prompt_length/clip_ratio:0.000 - episode/reward/mean:0.625 - episode/reward/max:10.000 - episode/reward/min:0.000 - episode/length/mean:49.438 - episode/length/max:50.000 - episode/length/min:34.000 - episode/tool_call_count/mean:0.000 - episode/success_rate:0.062 - episode/pick_heat_then_place_in_recep_success_rate:0.083 - episode/pick_clean_then_place_in_recep_success_rate:0.000 - episode/pick_two_obj_and_place_success_rate:0.000 - episode/pick_and_place_success_rate:0.250 - timing_s/gen:171.571 - timing_s/reward:0.342 - timing_s/old_log_prob:23.029 - timing_s/ref:25.973 - timing_s/adv:0.294 - timing_s/update_actor:78.428 - timing_s/step:299.830 - timing_per_token_ms/update_actor:0.079 - timing_per_token_ms/adv:0.000 - timing_per_token_ms/gen:1.115 - timing_per_token_ms/ref:0.026 - perf/total_num_tokens:991336.000 - perf/time_per_step:299.830 - perf/throughput:3306.326
+list(reward_extra_infos_dict.keys())=[]
+Avg size of step-level group: 5.916981132075471
+step:2 - global_seqlen/min:879820.000 - global_seqlen/max:879820.000 - global_seqlen/minmax_diff:0.000 - global_seqlen/balanced_min:879820.000 - global_seqlen/balanced_max:879820.000 - global_seqlen/mean:879820.000 - actor/entropy_loss:1.061 - training/rollout_probs_diff_max:0.183 - training/rollout_probs_diff_mean:0.006 - training/rollout_probs_diff_std:0.010 - episode/valid_action_ratio:0.972 - actor/kl_loss:0.009 - actor/kl_coef:0.010 - actor/pg_loss:0.010 - actor/pg_clipfrac:0.004 - actor/ppo_kl:0.000 - actor/pg_clipfrac_lower:0.000 - actor/grad_norm:2.445 - perf/mfu/actor:0.440 - perf/max_memory_allocated_gb:99.831 - perf/max_memory_reserved_gb:120.195 - perf/cpu_memory_used_gb:143.976 - actor/lr:0.000 - training/global_step:2.000 - training/epoch:0.000 - critic/score/mean:0.348 - critic/score/max:10.000 - critic/score/min:-0.100 - critic/rewards/mean:0.348 - critic/rewards/max:10.000 - critic/rewards/min:-0.100 - critic/advantages/mean:-0.013 - critic/advantages/max:7.387 - critic/advantages/min:-15.620 - critic/returns/mean:-0.013 - critic/returns/max:7.387 - critic/returns/min:-15.620 - response_length/mean:99.251 - response_length/max:512.000 - response_length/min:15.000 - response_length/clip_ratio:0.001 - prompt_length/mean:461.858 - prompt_length/max:914.000 - prompt_length/min:304.000 - prompt_length/clip_ratio:0.000 - episode/reward/mean:0.625 - episode/reward/max:10.000 - episode/reward/min:0.000 - episode/length/mean:48.562 - episode/length/max:50.000 - episode/length/min:22.000 - episode/tool_call_count/mean:0.000 - episode/success_rate:0.062 - episode/pick_and_place_success_rate:0.167 - episode/pick_clean_then_place_in_recep_success_rate:0.000 - episode/pick_two_obj_and_place_success_rate:0.000 - episode/pick_cool_then_place_in_recep_success_rate:0.000 - timing_s/gen:165.207 - timing_s/reward:0.332 - timing_s/old_log_prob:19.020 - timing_s/ref:18.629 - timing_s/adv:0.288 - timing_s/update_actor:70.713 - timing_s/step:274.350 - timing_per_token_ms/update_actor:0.080 - timing_per_token_ms/adv:0.000 - timing_per_token_ms/gen:1.062 - timing_per_token_ms/ref:0.021 - perf/total_num_tokens:879820.000 - perf/time_per_step:274.350 - perf/throughput:3206.929

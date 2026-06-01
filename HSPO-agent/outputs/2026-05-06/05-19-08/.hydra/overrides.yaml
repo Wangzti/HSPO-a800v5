@@ -1,0 +1,9 @@
+- data.train_files=/root/autodl-tmp/data/verl-agent/text/train.parquet
+- data.val_files=/root/autodl-tmp/data/verl-agent/text/test.parquet
+- actor_rollout_ref.model.path=/root/autodl-tmp/models/Qwen2.5-1.5B-Instruct
+- trainer.n_gpus_per_node=1
+- trainer.nnodes=1
+- trainer.total_epochs=3
+- trainer.logger=['console']
+- algorithm.hspo.warmup_epochs=0
+- algorithm.hspo.executor_epochs=0

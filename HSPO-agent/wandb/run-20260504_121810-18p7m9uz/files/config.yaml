@@ -1,0 +1,416 @@
+_wandb:
+    value:
+        cli_version: 0.26.1
+        e:
+            tpc9lbr1riaa6tsy2xuv4eco0rv7bypp:
+                args:
+                    - --node-ip-address=172.17.0.5
+                    - --node-manager-port=46059
+                    - --object-store-name=/root/autodl-tmp/ray_tmp_webshop/session_2026-05-04_12-16-16_935141_12524/sockets/plasma_store
+                    - --raylet-name=/root/autodl-tmp/ray_tmp_webshop/session_2026-05-04_12-16-16_935141_12524/sockets/raylet
+                    - --redis-address=None
+                    - --metrics-agent-port=61471
+                    - --logging-rotate-bytes=536870912
+                    - --logging-rotate-backup-count=5
+                    - --runtime-env-agent-port=47112
+                    - --gcs-address=172.17.0.5:62819
+                    - --session-name=session_2026-05-04_12-16-16_935141_12524
+                    - --temp-dir=/root/autodl-tmp/ray_tmp_webshop
+                    - --webui=
+                    - --cluster-id=27c5b2475f283422904b0e2ab51cd6bcf88cda70df2ff26729c77a60
+                    - --startup-token=16
+                    - --worker-launch-time-ms=1777868180056
+                    - --node-id=b56bdb573496c6bc6e7943c394318ac6808620704bd1404a29a44a24
+                    - --runtime-env-hash=-1580796864
+                    - --enable-resource-isolation=false
+                cpu_count: 72
+                cpu_count_logical: 144
+                cudaVersion: "13.0"
+                disk:
+                    /:
+                        total: "32212254720"
+                        used: "23059529728"
+                email: 2503193821@qq.com
+                executable: /root/miniconda3/envs/verl/bin/python3
+                git:
+                    commit: 796ed310287fa605c9292a0fce07a86d79fde05e
+                    remote: https://github.com/langfengQ/verl-agent.git
+                gpu: NVIDIA A800-SXM4-80GB
+                gpu_count: 2
+                gpu_nvidia:
+                    - architecture: Ampere
+                      cudaCores: 6912
+                      memoryTotal: "85899345920"
+                      name: NVIDIA A800-SXM4-80GB
+                      uuid: GPU-71149118-6ede-c060-7bc5-4af9a8109b42
+                    - architecture: Ampere
+                      cudaCores: 6912
+                      memoryTotal: "85899345920"
+                      name: NVIDIA A800-SXM4-80GB
+                      uuid: GPU-22f65f0b-e73b-6065-0045-b96e4fb91fd1
+                host: autodl-container-a4a74m633r-570d28ab
+                memory:
+                    total: "1081808490496"
+                os: Linux-5.15.0-78-generic-x86_64-with-glibc2.35
+                program: /root/miniconda3/envs/verl/lib/python3.12/site-packages/ray/_private/workers/default_worker.py
+                python: CPython 3.12.0
+                root: /root/projects/HSPO/verl-agent
+                startedAt: "2026-05-04T04:18:10.579416Z"
+                writerId: tpc9lbr1riaa6tsy2xuv4eco0rv7bypp
+        m: []
+        python_version: 3.12.0
+        t:
+            "1":
+                - 1
+                - 5
+                - 11
+                - 30
+                - 41
+                - 49
+                - 50
+                - 51
+                - 53
+                - 71
+                - 95
+                - 98
+                - 105
+            "2":
+                - 1
+                - 5
+                - 11
+                - 30
+                - 41
+                - 49
+                - 50
+                - 51
+                - 53
+                - 71
+                - 95
+                - 98
+                - 105
+            "3":
+                - 2
+                - 13
+                - 16
+                - 61
+            "4": 3.12.0
+            "5": 0.26.1
+            "6": 4.51.1
+            "12": 0.26.1
+            "13": linux-x86_64
+actor_rollout_ref:
+    value:
+        actor:
+            checkpoint:
+                contents:
+                    - model
+                    - optimizer
+                    - extra
+            clip_ratio: 0.2
+            clip_ratio_c: 3
+            clip_ratio_high: 0.2
+            clip_ratio_low: 0.2
+            entropy_coeff: 0.001
+            fsdp_config:
+                fsdp_size: -1
+                offload_policy: false
+                optimizer_offload: false
+                param_offload: false
+                reshard_after_forward: true
+                wrap_policy:
+                    min_num_params: 0
+            grad_clip: 1
+            invalid_action_penalty_coef: 0.1
+            kl_loss_coef: 0.01
+            kl_loss_type: low_var_kl
+            loss_agg_mode: token-mean
+            optim:
+                lr: 1e-06
+                lr_warmup_steps: -1
+                lr_warmup_steps_ratio: 0
+                min_lr_ratio: 0
+                num_cycles: 0.5
+                total_training_steps: 500
+                warmup_style: constant
+                weight_decay: 0.01
+            policy_loss:
+                loss_mode: vanilla
+            ppo_epochs: 1
+            ppo_max_token_len_per_gpu: 16384
+            ppo_micro_batch_size: null
+            ppo_micro_batch_size_per_gpu: 4
+            ppo_mini_batch_size: 32
+            shuffle: false
+            strategy: fsdp
+            ulysses_sequence_parallel_size: 1
+            use_dynamic_bsz: false
+            use_invalid_action_penalty: true
+            use_kl_loss: true
+            use_torch_compile: true
+        hybrid_engine: true
+        model:
+            enable_activation_offload: false
+            enable_gradient_checkpointing: true
+            external_lib: null
+            lora_alpha: 16
+            lora_rank: 0
+            path: /root/autodl-tmp/models/Qwen2.5-1.5B-Instruct
+            target_modules: all-linear
+            trust_remote_code: false
+            use_fused_kernels: false
+            use_liger: false
+            use_remove_padding: true
+            use_shm: false
+        ref:
+            fsdp_config:
+                param_offload: true
+                reshard_after_forward: true
+                wrap_policy:
+                    min_num_params: 0
+            log_prob_max_token_len_per_gpu: 16384
+            log_prob_micro_batch_size: null
+            log_prob_micro_batch_size_per_gpu: 8
+            log_prob_use_dynamic_bsz: false
+            strategy: fsdp
+            ulysses_sequence_parallel_size: 1
+            use_torch_compile: true
+        rollout:
+            chat_scheduler: null
+            disable_log_stats: true
+            do_sample: true
+            dtype: bfloat16
+            enable_chunked_prefill: false
+            enforce_eager: false
+            engine_kwargs:
+                sglang:
+                    attention_backend: null
+                vllm:
+                    swap_space: null
+            free_cache_engine: false
+            gpu_memory_utilization: 0.6
+            ignore_eos: false
+            layered_summon: false
+            load_format: dummy_dtensor
+            log_prob_max_token_len_per_gpu: 16384
+            log_prob_micro_batch_size: null
+            log_prob_micro_batch_size_per_gpu: 8
+            log_prob_use_dynamic_bsz: false
+            max_model_len: null
+            max_num_batched_tokens: 8192
+            max_num_seqs: 1024
+            mode: sync
+            multi_turn:
+                enable: false
+                format: chatml
+                max_turns: null
+                tool_config_path: null
+            "n": 1
+            name: vllm
+            prompt_length: 4096
+            response_length: 512
+            temperature: 1
+            tensor_model_parallel_size: 1
+            top_k: -1
+            top_p: 1
+            use_fire_sampling: false
+            val_kwargs:
+                do_sample: true
+                "n": 1
+                temperature: 0.4
+                top_k: -1
+                top_p: 1
+algorithm:
+    value:
+        adv_estimator: gigpo
+        filter_groups:
+            enable: false
+            max_num_gen_batches: 10
+        gamma: 0.95
+        gigpo:
+            enable_similarity: false
+            mode: mean_norm
+            similarity_thresh: 0.95
+            step_advantage_w: 1
+        kl_ctrl:
+            horizon: 10000
+            kl_coef: 0.001
+            target_kl: 0.1
+            type: fixed
+        kl_penalty: kl
+        lam: 1
+        norm_adv_by_std_in_grpo: true
+        pf_ppo:
+            reweight_method: pow
+            weight_pow: 2
+        use_kl_in_reward: false
+        use_pf_ppo: false
+critic:
+    value:
+        checkpoint:
+            contents:
+                - model
+                - optimizer
+                - extra
+        cliprange_value: 0.5
+        forward_max_token_len_per_gpu: 32768
+        forward_micro_batch_size: null
+        forward_micro_batch_size_per_gpu: null
+        grad_clip: 1
+        loss_agg_mode: token-mean
+        model:
+            enable_activation_offload: false
+            enable_gradient_checkpointing: true
+            external_lib: null
+            fsdp_config:
+                fsdp_size: -1
+                offload_policy: false
+                optimizer_offload: false
+                param_offload: false
+                reshard_after_forward: true
+                wrap_policy:
+                    min_num_params: 0
+            lora_alpha: 16
+            lora_rank: 0
+            path: ~/models/deepseek-llm-7b-chat
+            target_modules: all-linear
+            tokenizer_path: /root/autodl-tmp/models/Qwen2.5-1.5B-Instruct
+            trust_remote_code: false
+            use_remove_padding: false
+            use_shm: false
+        optim:
+            lr: 1e-05
+            lr_warmup_steps_ratio: 0
+            min_lr_ratio: null
+            total_training_steps: 500
+            warmup_style: constant
+            weight_decay: 0.01
+        ppo_epochs: 1
+        ppo_max_token_len_per_gpu: 32768
+        ppo_micro_batch_size: null
+        ppo_micro_batch_size_per_gpu: null
+        ppo_mini_batch_size: 32
+        rollout_n: 1
+        shuffle: false
+        strategy: fsdp
+        ulysses_sequence_parallel_size: 1
+        use_dynamic_bsz: false
+custom_reward_function:
+    value:
+        name: compute_score
+        path: null
+data:
+    value:
+        custom_cls:
+            name: null
+            path: null
+        filter_overlong_prompts: true
+        filter_overlong_prompts_workers: 1
+        image_key: images
+        max_prompt_length: 4096
+        max_response_length: 512
+        prompt_key: prompt
+        return_full_prompt: false
+        return_raw_chat: true
+        return_raw_input_ids: false
+        reward_fn_key: data_source
+        shuffle: true
+        tokenizer: null
+        train_batch_size: 4
+        train_files: /root/autodl-tmp/data/verl-agent/text/train.parquet
+        truncation: error
+        trust_remote_code: false
+        use_shm: false
+        val_batch_size: 16
+        val_files: /root/autodl-tmp/data/verl-agent/text/test.parquet
+        video_key: videos
+env:
+    value:
+        alfworld:
+            eval_dataset: eval_in_distribution
+        env_name: Webshop
+        history_length: 2
+        max_steps: 15
+        resources_per_worker:
+            num_cpus: 0.05
+            num_gpus: 0
+        rollout:
+            "n": 2
+        search:
+            log_requests: false
+            search_url: http://127.0.0.1:8000/retrieve
+            timeout: 60
+            topk: 3
+        seed: 0
+        sokoban:
+            dim_room:
+                - 6
+                - 6
+            mode: tiny_rgb_array
+            num_boxes: 1
+            search_depth: 30
+        webshop:
+            human_goals: false
+            use_small: true
+ray_init:
+    value:
+        _temp_dir: /root/autodl-tmp/ray_tmp_webshop
+        include_dashboard: false
+        num_cpus: 16
+reward_model:
+    value:
+        enable: false
+        forward_max_token_len_per_gpu: 32768
+        launch_reward_fn_async: false
+        max_length: null
+        micro_batch_size: null
+        micro_batch_size_per_gpu: null
+        model:
+            external_lib: null
+            fsdp_config:
+                fsdp_size: -1
+                param_offload: false
+                reshard_after_forward: true
+                wrap_policy:
+                    min_num_params: 0
+            input_tokenizer: /root/autodl-tmp/models/Qwen2.5-1.5B-Instruct
+            path: ~/models/FsfairX-LLaMA3-RM-v0.1
+            trust_remote_code: false
+            use_fused_kernels: false
+            use_remove_padding: false
+            use_shm: false
+        reward_manager: episode
+        sandbox_fusion:
+            max_concurrent: 64
+            url: null
+        strategy: fsdp
+        ulysses_sequence_parallel_size: 1
+        use_dynamic_bsz: false
+trainer:
+    value:
+        balance_batch: true
+        critic_warmup: 0
+        default_hdfs_dir: null
+        default_local_dir: /root/autodl-tmp/checkpoints/verl_agent_webshop/gigpo_qwen2.5_1.5b
+        del_local_ckpt_after_load: false
+        device: cuda
+        experiment_name: gigpo_qwen2.5_1.5b
+        log_val_generations: 0
+        logger:
+            - console
+            - wandb
+        max_actor_ckpt_to_keep: 2
+        max_critic_ckpt_to_keep: 2
+        n_gpus_per_node: 1
+        nnodes: 1
+        project_name: verl_agent_webshop
+        ray_wait_register_center_timeout: 300
+        resume_from_path: null
+        resume_mode: auto
+        rollout_data_dir: null
+        save_freq: 10
+        test_freq: 5
+        total_epochs: 150
+        total_training_steps: 500
+        val_before_train: false
+        val_only: false
+        validation_data_dir: null

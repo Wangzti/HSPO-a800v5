@@ -1,0 +1,104 @@
+wandb: Detected [openai] in use.
+wandb: Use W&B Weave for improved LLM call tracing. Install Weave with `pip install weave` then add `import weave` to the top of your script.
+wandb: For more information, check out the docs at: https://weave-docs.wandb.ai
+Using LocalLogger is deprecated. The constructor API will change
+Checkpoint tracker file does not exist: %s /root/projects/HSPO/verl-agent/checkpoints/verl_agent_alfworld/gigpo_qwen2.5_1.5b/latest_checkpointed_iteration.txt
+Training from scratch
+test_gen_batch meta info: {'eos_token_id': 151645, 'pad_token_id': 151643, 'recompute_log_prob': False, 'do_sample': True, 'validate': True}
+validation generation end
+[text][prompt] <|im_start|>system
+You are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>
+<|im_start|>user
+
+You are an expert agent operating in the ALFRED Embodied Environment.
+Your current observation is: -= Welcome to TextWorld, ALFRED! =-
+
+You are in the middle of a room. Looking quickly around you, you see a cabinet 27, a cabinet 26, a cabinet 25, a cabinet 24, a cabinet 23, a cabinet 22, a cabinet 21, a cabinet 20, a cabinet 19, a cabinet 18, a cabinet 17, a cabinet 16, a cabinet 15, a cabinet 14, a cabinet 13, a cabinet 12, a cabinet 11, a cabinet 10, a cabinet 9, a cabinet 8, a cabinet 7, a cabinet 6, a cabinet 5, a cabinet 4, a cabinet 3, a cabinet 2, a cabinet 1, a coffeemachine 1, a countertop 2, a countertop 1, a diningtable 1, a drawer 12, a drawer 11, a drawer 10, a drawer 9, a drawer 8, a drawer 7, a drawer 6, a drawer 5, a drawer 4, a drawer 3, a drawer 2, a drawer 1, a fridge 1, a garbagecan 1, a microwave 1, a sinkbasin 1, a stoveburner 4, a stoveburner 3, a stoveburner 2, a stoveburner 1, and a toaster 1.
+
+Your task is to: heat some tomato and put it in diningtable.
+Your admissible actions of the current situation are: ['go to cabinet 1'
+ 'go to cabinet 10'
+ 'go to cabinet 11'
+ 'go to cabinet 12'
+ 'go to cabinet 13'
+ 'go to cabinet 14'
+ 'go to cabinet 15'
+ 'go to cabinet 16'
+ 'go to cabinet 17'
+ 'go to cabinet 18'
+ 'go to cabinet 19'
+ 'go to cabinet 2'
+ 'go to cabinet 20'
+ 'go to cabinet 21'
+ 'go to cabinet 22'
+ 'go to cabinet 23'
+ 'go to cabinet 24'
+ 'go to cabinet 25'
+ 'go to cabinet 26'
+ 'go to cabinet 27'
+ 'go to cabinet 3'
+ 'go to cabinet 4'
+ 'go to cabinet 5'
+ 'go to cabinet 6'
+ 'go to cabinet 7'
+ 'go to cabinet 8'
+ 'go to cabinet 9'
+ 'go to coffeemachine 1'
+ 'go to countertop 1'
+ 'go to countertop 2'
+ 'go to diningtable 1'
+ 'go to drawer 1'
+ 'go to drawer 10'
+ 'go to drawer 11'
+ 'go to drawer 12'
+ 'go to drawer 2'
+ 'go to drawer 3'
+ 'go to drawer 4'
+ 'go to drawer 5'
+ 'go to drawer 6'
+ 'go to drawer 7'
+ 'go to drawer 8'
+ 'go to drawer 9'
+ 'go to fridge 1'
+ 'go to garbagecan 1'
+ 'go to microwave 1'
+ 'go to sinkbasin 1'
+ 'go to stoveburner 1'
+ 'go to stoveburner 2'
+ 'go to stoveburner 3'
+ 'go to stoveburner 4'
+ 'go to toaster 1'
+ 'inventory'
+ 'look'].
+
+Now it's your turn to take an action.
+You should first reason step-by-step about the current situation. This reasoning process MUST be enclosed within <think> </think> tags.
+Once you've finished your reasoning, you should choose an admissible action for current step and present it within <action> </action> tags.
+<|im_end|>
+<|im_start|>assistant
+
+[text][response] <think>
+  The task is to heat some tomato and put it on the dining table.
+  The available actions include going to cabinets, countertops, dining tables, drawers, fridges, garbage cans, microwaves, sinks, stoves, and toasters.
+  The cabinets contain various items, including tomato.
+  The fridge contains tomato.
+  The garbage can contains tomato.
+  The microwave can heat tomato.
+  The sink can heat tomato.
+  The stove can heat tomato.
+  The toaster can heat tomato.
+</think>
+
+<action>go to fridge 1</action><|im_end|>
+[text][score] 0.0
+("Initial validation metrics: {'val/text/test_score': "
+ "np.float64(0.14465108885709743), 'val/text/tool_call_count/mean': "
+ "np.float64(0.0), 'val/success_rate': np.float64(0.03125), "
+ "'val/pick_heat_then_place_in_recep_success_rate': np.float64(0.0), "
+ "'val/pick_cool_then_place_in_recep_success_rate': np.float64(0.0), "
+ "'val/pick_clean_then_place_in_recep_success_rate': np.float64(0.04), "
+ "'val/pick_two_obj_and_place_success_rate': np.float64(0.0), "
+ "'val/pick_and_place_success_rate': np.float64(0.07142857142857142), "
+ "'val/look_at_obj_in_light_success_rate': np.float64(0.08333333333333333)}")
+step:0 - val/text/test_score:0.145 - val/text/tool_call_count/mean:0.000 - val/success_rate:0.031 - val/pick_heat_then_place_in_recep_success_rate:0.000 - val/pick_cool_then_place_in_recep_success_rate:0.000 - val/pick_clean_then_place_in_recep_success_rate:0.040 - val/pick_two_obj_and_place_success_rate:0.000 - val/pick_and_place_success_rate:0.071 - val/look_at_obj_in_light_success_rate:0.083
+Training Progress:   0%|          | 0/2400 [00:00<?, ?it/s]

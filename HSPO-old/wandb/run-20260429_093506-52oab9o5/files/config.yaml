@@ -1,0 +1,92 @@
+_wandb:
+    value:
+        cli_version: 0.26.0
+        e:
+            5yhm0fc4m2rc2rkwap96am8lo8prnv2o:
+                args:
+                    - data.train_files=/mnt/nfs/ztwang/data/hspo/sft/alfworld_sft/train_format.parquet
+                    - data.val_files=/mnt/nfs/ztwang/data/hspo/sft/alfworld_sft/val_format.parquet
+                    - data.train_batch_size=64
+                    - data.micro_batch_size_per_gpu=2
+                    - data.max_length=12288
+                    - data.truncation=right
+                    - data.multiturn.enable=true
+                    - data.multiturn.messages_key=messages
+                    - model.partial_pretrain=/mnt/nfs/ztwang/models/Qwen2.5-1.5B-Instruct
+                    - +model.torch_dtype=bfloat16
+                    - model.enable_gradient_checkpointing=true
+                    - model.fsdp_config.cpu_offload=false
+                    - model.trust_remote_code=false
+                    - ulysses_sequence_parallel_size=1
+                    - +actor_rollout_ref.model.override_config.attn_implementation=flash_attention_2
+                    - optim.lr=2e-5
+                    - optim.warmup_steps_ratio=0.05
+                    - optim.clip_grad=1.0
+                    - trainer.total_epochs=2
+                    - trainer.default_local_dir=/mnt/nfs/ztwang/checkpoints/hspo/sft/alfworld_qwen2.5_1.5b_instruct_step1_format
+                    - trainer.project_name=hspo_sft
+                    - trainer.experiment_name=alfworld_format_qwen2.5_1.5b
+                    - trainer.logger=["console","wandb"]
+                    - trainer.seed=42
+                cpu_count: 48
+                cpu_count_logical: 48
+                cudaVersion: "12.9"
+                disk:
+                    /:
+                        total: "209709965312"
+                        used: "196645294080"
+                email: 2503193821@qq.com
+                executable: /mnt/nfs/ztwang/conda_envs/verl/bin/python3.12
+                git:
+                    commit: 92c15cf5aeb1170c6c5c6b0afee4dbd3f09ba7f6
+                    remote: git@github.com:Wangzti/HSPO.git
+                gpu: NVIDIA H800 PCIe
+                gpu_count: 1
+                gpu_nvidia:
+                    - architecture: Hopper
+                      cudaCores: 14592
+                      memoryTotal: "85520809984"
+                      name: NVIDIA H800 PCIe
+                      uuid: GPU-cd690150-56ff-7f55-0336-aa815b2d5629
+                host: softengine-KVM
+                memory:
+                    total: "270246432768"
+                os: Linux-5.15.0-139-generic-x86_64-with-glibc2.31
+                program: -m verl.trainer.fsdp_sft_trainer
+                python: CPython 3.12.0
+                root: /mnt/nfs/ztwang/projects/demos/HSPO/HSPO-agent
+                startedAt: "2026-04-29T01:35:06.143040Z"
+                writerId: 5yhm0fc4m2rc2rkwap96am8lo8prnv2o
+        m: []
+        python_version: 3.12.0
+        t:
+            "1":
+                - 1
+                - 11
+                - 30
+                - 41
+                - 49
+                - 50
+                - 51
+                - 71
+                - 98
+                - 105
+            "2":
+                - 1
+                - 11
+                - 30
+                - 41
+                - 49
+                - 50
+                - 51
+                - 71
+                - 98
+                - 105
+            "3":
+                - 13
+                - 61
+            "4": 3.12.0
+            "5": 0.26.0
+            "6": 4.51.1
+            "12": 0.26.0
+            "13": linux-x86_64

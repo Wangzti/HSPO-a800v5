@@ -1,0 +1,81 @@
+wandb: Detected [openai] in use.
+wandb: Use W&B Weave for improved LLM call tracing. Install Weave with `pip install weave` then add `import weave` to the top of your script.
+wandb: For more information, check out the docs at: https://weave-docs.wandb.ai
+Using LocalLogger is deprecated. The constructor API will change
+Checkpoint tracker file does not exist: %s /root/autodl-tmp/checkpoints/verl_agent_webshop/gigpo_qwen2.5_1.5b/latest_checkpointed_iteration.txt
+Training from scratch
+Training Progress:   1%|          | 4/500 [03:47<7:38:58, 55.52s/it]
+list(reward_extra_infos_dict.keys())=[]
+Avg size of step-level group: 3.3333333333333335
+step:1 - global_seqlen/min:166994.000 - global_seqlen/max:166994.000 - global_seqlen/minmax_diff:0.000 - global_seqlen/balanced_min:166994.000 - global_seqlen/balanced_max:166994.000 - global_seqlen/mean:166994.000 - actor/entropy_loss:1.112 - training/rollout_probs_diff_max:0.214 - training/rollout_probs_diff_mean:0.005 - training/rollout_probs_diff_std:0.010 - episode/valid_action_ratio:0.217 - actor/kl_loss:0.002 - actor/kl_coef:0.010 - actor/pg_loss:-0.006 - actor/pg_clipfrac:0.004 - actor/ppo_kl:-0.000 - actor/pg_clipfrac_lower:0.000 - actor/grad_norm:0.302 - perf/mfu/actor:0.399 - perf/max_memory_allocated_gb:68.169 - perf/max_memory_reserved_gb:84.240 - perf/cpu_memory_used_gb:72.492 - actor/lr:0.000 - training/global_step:1.000 - training/epoch:0.000 - critic/score/mean:-0.078 - critic/score/max:0.000 - critic/score/min:-0.100 - critic/rewards/mean:-0.078 - critic/rewards/max:0.000 - critic/rewards/min:-0.100 - critic/advantages/mean:0.003 - critic/advantages/max:0.166 - critic/advantages/min:-0.092 - critic/returns/mean:0.003 - critic/returns/max:0.166 - critic/returns/min:-0.092 - response_length/mean:114.400 - response_length/max:512.000 - response_length/min:3.000 - response_length/clip_ratio:0.017 - prompt_length/mean:1277.217 - prompt_length/max:2455.000 - prompt_length/min:211.000 - prompt_length/clip_ratio:0.000 - episode/reward/mean:0.000 - episode/reward/max:0.000 - episode/reward/min:0.000 - episode/length/mean:14.750 - episode/length/max:15.000 - episode/length/min:13.000 - episode/tool_call_count/mean:0.000 - episode/success_rate:0.000 - episode/webshop_task_score (not success_rate):0.071 - timing_s/gen:39.180 - timing_s/reward:0.057 - timing_s/old_log_prob:4.221 - timing_s/ref:9.276 - timing_s/adv:0.018 - timing_s/update_actor:15.478 - timing_s/step:68.272 - timing_per_token_ms/gen:2.854 - timing_per_token_ms/ref:0.056 - timing_per_token_ms/adv:0.000 - timing_per_token_ms/update_actor:0.093 - perf/total_num_tokens:166994.000 - perf/time_per_step:68.272 - perf/throughput:2446.010
+list(reward_extra_infos_dict.keys())=[]
+Avg size of step-level group: 2.731707317073171
+step:2 - global_seqlen/min:150746.000 - global_seqlen/max:150746.000 - global_seqlen/minmax_diff:0.000 - global_seqlen/balanced_min:150746.000 - global_seqlen/balanced_max:150746.000 - global_seqlen/mean:150746.000 - actor/entropy_loss:0.955 - training/rollout_probs_diff_max:0.197 - training/rollout_probs_diff_mean:0.006 - training/rollout_probs_diff_std:0.010 - episode/valid_action_ratio:0.554 - actor/kl_loss:0.020 - actor/kl_coef:0.010 - actor/pg_loss:0.034 - actor/pg_clipfrac:0.008 - actor/ppo_kl:0.002 - actor/pg_clipfrac_lower:0.000 - actor/grad_norm:8.011 - perf/mfu/actor:0.406 - perf/max_memory_allocated_gb:69.370 - perf/max_memory_reserved_gb:84.240 - perf/cpu_memory_used_gb:73.041 - actor/lr:0.000 - training/global_step:2.000 - training/epoch:0.000 - critic/score/mean:0.491 - critic/score/max:10.000 - critic/score/min:-0.100 - critic/rewards/mean:0.491 - critic/rewards/max:10.000 - critic/rewards/min:-0.100 - critic/advantages/mean:-0.041 - critic/advantages/max:13.390 - critic/advantages/min:-6.810 - critic/returns/mean:-0.041 - critic/returns/max:13.390 - critic/returns/min:-6.810 - response_length/mean:103.089 - response_length/max:252.000 - response_length/min:33.000 - response_length/clip_ratio:0.000 - prompt_length/mean:1242.857 - prompt_length/max:2508.000 - prompt_length/min:207.000 - prompt_length/clip_ratio:0.000 - episode/reward/mean:1.250 - episode/reward/max:10.000 - episode/reward/min:0.000 - episode/length/mean:13.625 - episode/length/max:15.000 - episode/length/min:6.000 - episode/tool_call_count/mean:0.000 - episode/success_rate:0.125 - episode/webshop_task_score (not success_rate):0.150 - timing_s/gen:31.771 - timing_s/reward:0.062 - timing_s/old_log_prob:3.400 - timing_s/ref:3.508 - timing_s/adv:0.017 - timing_s/update_actor:13.723 - timing_s/step:52.516 - timing_per_token_ms/gen:2.752 - timing_per_token_ms/ref:0.023 - timing_per_token_ms/adv:0.000 - timing_per_token_ms/update_actor:0.091 - perf/total_num_tokens:150746.000 - perf/time_per_step:52.516 - perf/throughput:2870.495
+list(reward_extra_infos_dict.keys())=[]
+Avg size of step-level group: 2.2857142857142856
+step:3 - global_seqlen/min:82668.000 - global_seqlen/max:82668.000 - global_seqlen/minmax_diff:0.000 - global_seqlen/balanced_min:82668.000 - global_seqlen/balanced_max:82668.000 - global_seqlen/mean:82668.000 - actor/entropy_loss:0.922 - training/rollout_probs_diff_max:0.319 - training/rollout_probs_diff_mean:0.005 - training/rollout_probs_diff_std:0.010 - episode/valid_action_ratio:0.688 - actor/kl_loss:0.007 - actor/kl_coef:0.010 - actor/pg_loss:-0.051 - actor/pg_clipfrac:0.003 - actor/ppo_kl:0.001 - actor/pg_clipfrac_lower:0.000 - actor/grad_norm:8.577 - perf/mfu/actor:0.367 - perf/max_memory_allocated_gb:69.370 - perf/max_memory_reserved_gb:84.240 - perf/cpu_memory_used_gb:72.798 - actor/lr:0.000 - training/global_step:3.000 - training/epoch:0.000 - critic/score/mean:0.844 - critic/score/max:10.000 - critic/score/min:-0.100 - critic/rewards/mean:0.844 - critic/rewards/max:10.000 - critic/rewards/min:-0.100 - critic/advantages/mean:0.009 - critic/advantages/max:10.539 - critic/advantages/min:-10.810 - critic/returns/mean:0.009 - critic/returns/max:10.539 - critic/returns/min:-10.810 - response_length/mean:113.137 - response_length/max:410.000 - response_length/min:10.000 - response_length/clip_ratio:0.000 - prompt_length/mean:920.213 - prompt_length/max:2242.000 - prompt_length/min:196.000 - prompt_length/clip_ratio:0.000 - episode/reward/mean:1.250 - episode/reward/max:10.000 - episode/reward/min:0.000 - episode/length/mean:9.750 - episode/length/max:15.000 - episode/length/min:3.000 - episode/tool_call_count/mean:0.000 - episode/success_rate:0.125 - episode/webshop_task_score (not success_rate):0.271 - timing_s/gen:37.452 - timing_s/reward:0.045 - timing_s/old_log_prob:1.960 - timing_s/ref:2.158 - timing_s/adv:0.054 - timing_s/update_actor:8.229 - timing_s/step:49.926 - timing_per_token_ms/gen:4.138 - timing_per_token_ms/ref:0.026 - timing_per_token_ms/adv:0.001 - timing_per_token_ms/update_actor:0.100 - perf/total_num_tokens:82668.000 - perf/time_per_step:49.926 - perf/throughput:1655.811
+list(reward_extra_infos_dict.keys())=[]
+Avg size of step-level group: 3.870967741935484
+step:4 - global_seqlen/min:135955.000 - global_seqlen/max:135955.000 - global_seqlen/minmax_diff:0.000 - global_seqlen/balanced_min:135955.000 - global_seqlen/balanced_max:135955.000 - global_seqlen/mean:135955.000 - actor/entropy_loss:1.036 - training/rollout_probs_diff_max:0.123 - training/rollout_probs_diff_mean:0.006 - training/rollout_probs_diff_std:0.010 - episode/valid_action_ratio:0.842 - actor/kl_loss:0.011 - actor/kl_coef:0.010 - actor/pg_loss:-0.004 - actor/pg_clipfrac:0.004 - actor/ppo_kl:0.001 - actor/pg_clipfrac_lower:0.000 - actor/grad_norm:0.278 - perf/mfu/actor:0.389 - perf/max_memory_allocated_gb:69.370 - perf/max_memory_reserved_gb:84.240 - perf/cpu_memory_used_gb:72.967 - actor/lr:0.000 - training/global_step:4.000 - training/epoch:0.000 - critic/score/mean:-0.016 - critic/score/max:0.000 - critic/score/min:-0.100 - critic/rewards/mean:-0.016 - critic/rewards/max:0.000 - critic/rewards/min:-0.100 - critic/advantages/mean:0.005 - critic/advantages/max:0.066 - critic/advantages/min:-0.185 - critic/returns/mean:0.005 - critic/returns/max:0.066 - critic/returns/min:-0.185 - response_length/mean:136.158 - response_length/max:461.000 - response_length/min:39.000 - response_length/clip_ratio:0.000 - prompt_length/mean:996.800 - prompt_length/max:1773.000 - prompt_length/min:204.000 - prompt_length/clip_ratio:0.000 - episode/reward/mean:0.000 - episode/reward/max:0.000 - episode/reward/min:0.000 - episode/length/mean:14.125 - episode/length/max:15.000 - episode/length/min:8.000 - episode/tool_call_count/mean:0.000 - episode/success_rate:0.000 - episode/webshop_task_score (not success_rate):0.003 - timing_s/gen:37.170 - timing_s/reward:0.054 - timing_s/old_log_prob:3.136 - timing_s/ref:3.334 - timing_s/adv:0.022 - timing_s/update_actor:12.753 - timing_s/step:56.501 - timing_per_token_ms/gen:2.275 - timing_per_token_ms/ref:0.025 - timing_per_token_ms/adv:0.000 - timing_per_token_ms/update_actor:0.094 - perf/total_num_tokens:135955.000 - perf/time_per_step:56.501 - perf/throughput:2406.221
+list(reward_extra_infos_dict.keys())=[]
+Avg size of step-level group: 3.096774193548387
+test_gen_batch meta info: {'eos_token_id': 151645, 'pad_token_id': 151643, 'recompute_log_prob': False, 'do_sample': True, 'validate': True}
+validation generation end
+[text][prompt] <|im_start|>system
+You are Qwen, created by Alibaba Cloud. You are a helpful assistant.<|im_end|>
+<|im_start|>user
+
+You are an expert autonomous agent operating in the WebShop e‑commerce environment.
+Your task is to: Find me wash cold, machine wash men's shirts with polyester heathers, heathers cotton, cotton heather, needle sleeve, classic fit with color: olive, and fit type: women, and size: medium, and price lower than 50.00 dollars.
+Prior to this step, you have already taken 7 step(s). Below are the most recent 2 observations and the corresponding actions you took: [Observation 6: ''Back to Search' [SEP] '< Prev' [SEP] 'fit type' [SEP] 'men' [SEP] 'women' [SEP] 'youth' [SEP] 'color' [SEP] 'black' [SEP] 'navy' [SEP] 'asphalt' [SEP] 'cranberry' [SEP] 'kelly green' [SEP] 'brown' [SEP] 'olive' [SEP] 'dark heather' [SEP] 'purple' [SEP] 'royal blue' [SEP] 'size' [SEP] 'small' [SEP] 'medium' [SEP] 'large' [SEP] 'x-large' [SEP] 'xx-large' [SEP] '3x-large' [SEP] '2t' [SEP] '3t' [SEP] '4t' [SEP] 'x-small' [SEP] 'I Tackled 100 Day Of School Football Boy 100th Day School T-Shirt' [SEP] 'Price: $16.99' [SEP] 'Rating: N.A.' [SEP] 'Description' [SEP] 'Features' [SEP] 'Reviews' [SEP] 'Buy Now'', Action 6: 'click[youth]']
+[Observation 7: ''Back to Search' [SEP] '< Prev' [SEP] 'fit type' [SEP] 'men' [SEP] 'women' [SEP] 'youth' [SEP] 'color' [SEP] 'black' [SEP] 'navy' [SEP] 'asphalt' [SEP] 'cranberry' [SEP] 'kelly green' [SEP] 'brown' [SEP] 'olive' [SEP] 'dark heather' [SEP] 'purple' [SEP] 'royal blue' [SEP] 'size' [SEP] 'small' [SEP] 'medium' [SEP] 'large' [SEP] 'x-large' [SEP] 'xx-large' [SEP] '3x-large' [SEP] '2t' [SEP] '3t' [SEP] '4t' [SEP] 'x-small' [SEP] 'I Tackled 100 Day Of School Football Boy 100th Day School T-Shirt' [SEP] 'Price: $16.99' [SEP] 'Rating: N.A.' [SEP] 'Description' [SEP] 'Features' [SEP] 'Reviews' [SEP] 'Buy Now'', Action 7: 'click[youth]']
+You are now at step 8 and your current observation is: 'Back to Search' [SEP] '< Prev' [SEP] 'fit type' [SEP] 'men' [SEP] 'women' [SEP] 'youth' [SEP] 'color' [SEP] 'black' [SEP] 'navy' [SEP] 'asphalt' [SEP] 'cranberry' [SEP] 'kelly green' [SEP] 'brown' [SEP] 'olive' [SEP] 'dark heather' [SEP] 'purple' [SEP] 'royal blue' [SEP] 'size' [SEP] 'small' [SEP] 'medium' [SEP] 'large' [SEP] 'x-large' [SEP] 'xx-large' [SEP] '3x-large' [SEP] '2t' [SEP] '3t' [SEP] '4t' [SEP] 'x-small' [SEP] 'I Tackled 100 Day Of School Football Boy 100th Day School T-Shirt' [SEP] 'Price: $16.99' [SEP] 'Rating: N.A.' [SEP] 'Description' [SEP] 'Features' [SEP] 'Reviews' [SEP] 'Buy Now'.
+Your admissible actions of the current situation are:
+[
+'click[back to search]',
+'click[< prev]',
+'click[description]',
+'click[features]',
+'click[reviews]',
+'click[buy now]',
+'click[men]',
+'click[women]',
+'click[youth]',
+'click[black]',
+'click[navy]',
+'click[asphalt]',
+'click[cranberry]',
+'click[kelly green]',
+'click[brown]',
+'click[olive]',
+'click[dark heather]',
+'click[purple]',
+'click[royal blue]',
+'click[small]',
+'click[medium]',
+'click[large]',
+'click[x-large]',
+'click[xx-large]',
+'click[3x-large]',
+'click[2t]',
+'click[3t]',
+'click[4t]',
+'click[x-small]',
+].
+
+Now it's your turn to take one action for the current step.
+You should first reason step-by-step about the current situation, then think carefully which admissible action best advances the shopping goal. This reasoning process MUST be enclosed within <think> </think> tags.
+Once you've finished your reasoning, you should choose an admissible action for current step and present it within <action> </action> tags.
+<|im_end|>
+<|im_start|>assistant
+
+[text][response] <think>
+The user has already searched for "Back to Search", "fit type", "men", "women", "youth", "color", "olive", "size", "medium", and "price lower than 50.00 dollars".
+The user has not specified the material or needle sleeve information yet.
+The user wants to find a men's shirt with polyester heathers, heathers cotton, cotton heather, needle sleeve, classic fit, color: olive, and fit type: women, and size: medium, and price lower than 50.00 dollars.
+</think>
+
+<action>click[fit type]</action><|im_end|>
+[text][score] 0.0
+test_gen_batch meta info: {'eos_token_id': 151645, 'pad_token_id': 151643, 'recompute_log_prob': False, 'do_sample': True, 'validate': True}
+validation generation end

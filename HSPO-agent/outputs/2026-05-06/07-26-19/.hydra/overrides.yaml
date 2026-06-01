@@ -1,0 +1,8 @@
+- algorithm.hspo.warmup_epochs=0
+- algorithm.hspo.executor_epochs=0
+- trainer.total_epochs=3
+- actor_rollout_ref.rollout.gpu_memory_utilization=0.2
+- algorithm.use_kl_in_reward=False
+- actor_rollout_ref.actor.use_kl_loss=False
+- +actor_rollout_ref.ref.log_prob_micro_batch_size_per_gpu=32
+- trainer.logger=['console']

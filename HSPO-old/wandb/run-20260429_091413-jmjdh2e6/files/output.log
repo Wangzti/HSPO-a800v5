@@ -1,0 +1,4 @@
+Using LocalLogger is deprecated. The constructor API will change
+Total training steps: 724
+Epoch 1/2:   0%|                                                                                                                              | 0/362 [00:00<?, ?it/s]
+step:1 - train/loss:2.117 - train/lr(1e-3):0.001

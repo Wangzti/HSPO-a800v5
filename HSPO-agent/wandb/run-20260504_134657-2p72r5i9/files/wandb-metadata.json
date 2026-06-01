@@ -1,0 +1,66 @@
+{
+  "os":  "Linux-5.15.0-78-generic-x86_64-with-glibc2.35",
+  "python":  "CPython 3.12.0",
+  "startedAt":  "2026-05-04T05:46:57.013425Z",
+  "args":  [
+    "--node-ip-address=172.17.0.5",
+    "--node-manager-port=45057",
+    "--object-store-name=/root/autodl-tmp/ray_tmp_webshop/session_2026-05-04_13-45-06_771432_209895/sockets/plasma_store",
+    "--raylet-name=/root/autodl-tmp/ray_tmp_webshop/session_2026-05-04_13-45-06_771432_209895/sockets/raylet",
+    "--redis-address=None",
+    "--metrics-agent-port=64141",
+    "--logging-rotate-bytes=536870912",
+    "--logging-rotate-backup-count=5",
+    "--runtime-env-agent-port=59055",
+    "--gcs-address=172.17.0.5:64706",
+    "--session-name=session_2026-05-04_13-45-06_771432_209895",
+    "--temp-dir=/root/autodl-tmp/ray_tmp_webshop",
+    "--webui=",
+    "--cluster-id=0e551830b46ec2e35a8666b836fa4ad6768e6e7866aba383a8287454",
+    "--startup-token=16",
+    "--worker-launch-time-ms=1777873510447",
+    "--node-id=5e1bf8928ba33c8b7a908b1d2aa6e73dd3a0ea0bcd7fac4ea5b562d8",
+    "--runtime-env-hash=-1580796864",
+    "--enable-resource-isolation=false"
+  ],
+  "program":  "/root/miniconda3/envs/verl/lib/python3.12/site-packages/ray/_private/workers/default_worker.py",
+  "git":  {
+    "remote":  "https://github.com/langfengQ/verl-agent.git",
+    "commit":  "796ed310287fa605c9292a0fce07a86d79fde05e"
+  },
+  "email":  "2503193821@qq.com",
+  "root":  "/root/projects/HSPO/verl-agent",
+  "host":  "autodl-container-a4a74m633r-570d28ab",
+  "executable":  "/root/miniconda3/envs/verl/bin/python3",
+  "cpu_count":  72,
+  "cpu_count_logical":  144,
+  "gpu":  "NVIDIA A800-SXM4-80GB",
+  "gpu_count":  2,
+  "disk":  {
+    "/":  {
+      "total":  "32212254720",
+      "used":  "23063171072"
+    }
+  },
+  "memory":  {
+    "total":  "1081808490496"
+  },
+  "gpu_nvidia":  [
+    {
+      "name":  "NVIDIA A800-SXM4-80GB",
+      "memoryTotal":  "85899345920",
+      "cudaCores":  6912,
+      "architecture":  "Ampere",
+      "uuid":  "GPU-71149118-6ede-c060-7bc5-4af9a8109b42"
+    },
+    {
+      "name":  "NVIDIA A800-SXM4-80GB",
+      "memoryTotal":  "85899345920",
+      "cudaCores":  6912,
+      "architecture":  "Ampere",
+      "uuid":  "GPU-22f65f0b-e73b-6065-0045-b96e4fb91fd1"
+    }
+  ],
+  "cudaVersion":  "13.0",
+  "writerId":  "mluaxgg0phm5f5zj9ouhgctkzv4nw7fr"
+}

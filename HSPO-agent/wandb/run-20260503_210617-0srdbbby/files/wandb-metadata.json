@@ -1,0 +1,59 @@
+{
+  "os":  "Linux-5.15.0-78-generic-x86_64-with-glibc2.35",
+  "python":  "CPython 3.12.0",
+  "startedAt":  "2026-05-03T13:06:17.907932Z",
+  "args":  [
+    "--node-ip-address=172.17.0.5",
+    "--node-manager-port=36155",
+    "--object-store-name=/root/autodl-tmp/ray_tmp/session_2026-05-03_21-03-53_682546_215718/sockets/plasma_store",
+    "--raylet-name=/root/autodl-tmp/ray_tmp/session_2026-05-03_21-03-53_682546_215718/sockets/raylet",
+    "--redis-address=None",
+    "--metrics-agent-port=57821",
+    "--logging-rotate-bytes=536870912",
+    "--logging-rotate-backup-count=5",
+    "--runtime-env-agent-port=54565",
+    "--gcs-address=172.17.0.5:62433",
+    "--session-name=session_2026-05-03_21-03-53_682546_215718",
+    "--temp-dir=/root/autodl-tmp/ray_tmp",
+    "--webui=127.0.0.1:8265",
+    "--cluster-id=c2909cfdfee2456f242fabd5d3a4b9b378c8c1db72736b87eab38ed1",
+    "--startup-token=16",
+    "--worker-launch-time-ms=1777813436252",
+    "--node-id=8daa1ce0ea836fc322a311402988057594e51ab98651899f1b11526e",
+    "--runtime-env-hash=-1580796864",
+    "--enable-resource-isolation=false"
+  ],
+  "program":  "/root/miniconda3/envs/verl/lib/python3.12/site-packages/ray/_private/workers/default_worker.py",
+  "git":  {
+    "remote":  "https://github.com/langfengQ/verl-agent.git",
+    "commit":  "796ed310287fa605c9292a0fce07a86d79fde05e"
+  },
+  "email":  "2503193821@qq.com",
+  "root":  "/root/projects/HSPO/verl-agent",
+  "host":  "autodl-container-a4a74m633r-570d28ab",
+  "executable":  "/root/miniconda3/envs/verl/bin/python3",
+  "cpu_count":  72,
+  "cpu_count_logical":  144,
+  "gpu":  "NVIDIA A800-SXM4-80GB",
+  "gpu_count":  1,
+  "disk":  {
+    "/":  {
+      "total":  "32212254720",
+      "used":  "25549197312"
+    }
+  },
+  "memory":  {
+    "total":  "1081808490496"
+  },
+  "gpu_nvidia":  [
+    {
+      "name":  "NVIDIA A800-SXM4-80GB",
+      "memoryTotal":  "85899345920",
+      "cudaCores":  6912,
+      "architecture":  "Ampere",
+      "uuid":  "GPU-71149118-6ede-c060-7bc5-4af9a8109b42"
+    }
+  ],
+  "cudaVersion":  "13.0",
+  "writerId":  "do4dr986o40rdnj1enbze5vxz90qw13w"
+}
