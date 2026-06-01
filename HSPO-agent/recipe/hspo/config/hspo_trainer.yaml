@@ -1,0 +1,92 @@
+hydra:
+  searchpath:
+    - file://verl/trainer/config
+
+defaults:
+  - ppo_trainer
+  - _self_
+
+data:
+  gen_batch_size: ${data.train_batch_size}
+
+reward_model:
+  reward_manager: episode
+  overlong_buffer:
+    enable: False
+    len: 0
+    penalty_factor: 0.0
+    log: False
+
+algorithm:
+  adv_estimator: hspo
+
+  # HSPO-specific configuration
+  hspo:
+    # ABG (Anchored Branch Grouping) parameters
+    abg_min_group_size: 2
+    abg_target_size: 4
+    abg_max_branch: 4
+    abg_step_cost: -0.1
+    abg_completion_bonus: 2.0
+    remove_std: true
+
+    # Low-level (action) PPO
+    low_clip_epsilon: 0.2
+    low_beta: 0.01
+
+    # High-level (subgoal) macro-PPO
+    high_gamma: 0.99
+    high_lam: 0.95
+    high_clip_epsilon: 0.2
+    high_beta: 0.01
+
+    # Switch / termination
+    switch_alpha: 0.5
+    alpha_t: 0.5
+
+    # Token-level routing weights
+    alpha_l: 1.0
+    alpha_h: 1.0
+    alpha_sft: 0.1
+    sg_kl_beta: 0.01
+
+    # Staged training schedule
+    warmup_epochs: 10
+    executor_epochs: 100
+
+    # Mask settings
+    assign_high_to_subgoal: true
+    assign_high_to_switch: false
+    include_tags_mask: false
+    fallback_action_to_full_response: true
+
+    # Normalization
+    norm_adv: true
+
+  # KL penalty
+  use_kl_in_reward: True
+  kl_coef: 0.01
+  target_kl: 0.02
+  kl_horizon: 1000
+
+  # Invalid action penalty
+  invalid_action_penalty_coef: 0.0
+
+  # Dynamic sampling
+  filter_groups:
+    enable: False
+    metric: null
+    max_num_gen_batches: 0
+
+trainer:
+  project_name: verl-hspo
+  val_out: False
+  val_only: False
+  total_epochs: 150
+  val_every_n_epochs: 5
+  save_every_n_epochs: 20
+  ckpt_dir: /root/autodl-tmp/checkpoints/hspo
+  logger: wandb
+  n_gpus_per_node: 4
+  nnodes: 1
+  device: cuda

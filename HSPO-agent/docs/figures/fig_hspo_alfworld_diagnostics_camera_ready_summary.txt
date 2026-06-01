@@ -1,0 +1,6 @@
+num_trajectories=2012
+Pick: n=713, mean_steps=8.92, mean_subgoals=4.00
+Look: n=239, mean_steps=8.82, mean_subgoals=3.71
+Clean: n=390, mean_steps=14.81, mean_subgoals=5.95
+Heat: n=293, mean_steps=16.36, mean_subgoals=5.91
+Cool: n=377, mean_steps=14.32, mean_subgoals=5.94

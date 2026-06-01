@@ -1,0 +1,638 @@
+\documentclass{article}
+
+% if you need to pass options to natbib, use, e.g.:
+%     \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2026
+
+%\usepackage{neurips_2026}
+
+% 正确传递 natbib 选项，不冲突
+\PassOptionsToPackage{numbers, sort&compress}{natbib}
+\usepackage[dandb, final]{neurips_2026}
+
+ 
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{nicefrac}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\newcommand{\gx}[1]{\textcolor{cyan}{#1}}
+\newcommand{\wang}[1]{\textcolor{blue}{#1}}
+\newcommand{\wei}[1]{\textcolor{red}{#1}}
+
+\title{HSPO: Hierarchical Subgoal-conditioned Process Optimization for Long-Horizon LLM Agents}
+
+\author{
+Zhuoting Wang$^{1,2}$, Letong Meng$^{1,2}$, 
+\textbf{Wei Du}$^2$\textbf{,} \textbf{Dong Wu}$^3$\textbf{,} \textbf{Dong Zhang}$^3$\textbf{,} \textbf{Jun Wang}$^1$\textbf{,} \textbf{Guoxian Yu}$^{1,}$\thanks{Corresponding author} \\
+$^1$School of Software, Shandong University, Jinan, China \\
+$^2$SDU-NTU Centre for AI Research, Shandong University, Jinan, China \\
+$^3$Inspur Data Technology Co, Ltd, Jinan, China\\
+\texttt{\{zhtwang, ltmeng\}@mail.sdu.edu.cn},  \texttt{\{zhangdong, wudongbj\}@inspur.com}, \\ \texttt{\{duwei, kingjun, gxyu\}@sdu.edu.cn}
+}
+
+\begin{document}
+
+\maketitle
+\begin{abstract}
+Reinforcement learning (RL) for long-horizon LLM agents typically learns from sparse, trajectory-level returns, which conflate strategic subgoal selection with low-level action execution. When a chosen subgoal is globally suboptimal, all actions in its segment can be penalized, including locally correct behaviors that should remain reusable under a better plan. We call this failure mode as \textbf{intra-subgoal credit collapse}, and propose a hierarchical RL framework \textbf{Hierarchical Subgoal-conditioned Process Optimization} (\textbf{HSPO}) that mitigates this collapse via three coordinated mechanisms. (i) An online Plan-Execute interface factorize each step into termination, subgoal selection, and action execution, so credit is assigned at appropriate decision level. (ii)  \textbf{Anchored Branch Grouping (ABG)} contrasts candidate actions under identical state-subgoal anchors and scores them with a state--grounded milestone scorer, isolating local execution progress from delayed global outcomes. (iii) Token-level credit routing applies termination, high-level and low-level losses only to their corresponding output spans, and adds subgoal-distribution regularization to prevent planner drift during executor updates. This objective discourages globally harmful subgoals while preserving executor behaviors that correctly implement them.%{具体结果目前先占位}On ALFWorld and WebShop, HSPO improves over flat RL, group-based RL, and hierarchical Plan-Execute baselines by \textbf{[X.X]}--\textbf{[Y.Y]} points, with the largest gains on multi-subgoal tasks. Diagnostic evaluations further show that HSPO improves executor skill preservation under globally suboptimal subgoals by \textbf{[Z.Z]} points, directly validating its mitigation of intra-subgoal credit collapse.
+\end{abstract}
+
+
+%\wei{摘要参考版本：Reinforcement learning for long-horizon LLM agents relies on flat trajectory‑level returns, which conflate subgoal selection and primitive action execution.(背景，一句话)  This leads to intra‑subgoal credit collapse, where when a subgoal is globally suboptimal, every action within that segment is penalized, including locally correct executions that should remain reusable under better subgoal choices. (问题，用你定义的这个信用坍塌)  We propose Hierarchical Subgoal-conditioned Process Optimization (HSPO), a hierarchical RL framework that resolves this collapse through three mechanisms. First, an explicit Plan‑Execute interface (<switch>/<subgoal>/<action>) separates subgoal selection from action execution at every step, ensuring credit can be routed to the correct level. Second, a subgoal‑grounded local credit mechanism constructs action comparison groups under fixed task–state–subgoal anchors and scores each action by deterministic one‑step progress toward the active subgoal, so that locally correct actions are no longer penalized by a globally bad subgoal. Third, token‑level credit routing applies high‑level, low‑level, and termination losses only to their corresponding spans, paired with a KL regularizer that prevents planner drift during executor updates, thereby decoupling the two levels of optimization. 方法，三个内容不用展开，概述解决了什么问题)The result is that the planner can be discouraged from choosing a harmful subgoal, while the executor simultaneously preserves actions that correctly implement it.(结果，目前是定性的概括，后面加实验结果)}
+
+
+
+
+\section{Introduction}
+
+Large language models (LLMs) are increasingly deployed as interactive agents that observe their environments, plan over multiple steps, and execute actions in dynamic tasks~\cite{yao2022react,shinn2023reflexion,wang2024voyager}. Reinforcement learning (RL) provides a natural framework for improving such agents from interaction feedback. However, in long-horizon settings rewards are often sparse or delayed, making it hard to assign credit across the heterogeneous decisions within a trajectory.
+
+%\wei{第一段很好，介绍背景和挑战，不用改}
+
+A common solution is to optimize the policy using trajectory-level or segment-level returns. This is insufficient for hierarchical agent behavior. Consider a task such as \emph{clean a cup and place it in a cabinet}. If the agent selects the subgoal \emph{cool the cup}, the subgoal is globally inappropriate. Yet, conditional on this active subgoal, an action such as \emph{put the cup in the fridge} is locally correct. Penalizing the entire segment because the final task fails conflates two distinct judgments: whether the subgoal should have been selected, and whether the executor correctly implemented it.
+
+
+%\wei{第二段举例说明要解决的问题。这一段也可以，但是没定义hierarchical agent behavior就开始举例子，同时最后一句表达的不够准确。参考版本：A simple and widely used approach is to optimize the policy with trajectory‑level or segment‑level returns. However, this approach breaks down when the agent behaves hierarchically, that is, when it first chooses a subgoal and then executes a sequence of primitive actions to achieve that subgoal before moving to the next. Consider the task \emph{clean a cup and place it in a cabinet.} If the agent chooses the subgoal \emph{cool the cup}, that subgoal is globally wrong. Yet, given that active subgoal, the action \emph{put the cup in the fridge} is locally correct. 最后一句调整得更易懂一些,因为审稿人通常是大同行：A trajectory return penalizes the whole segment equally, which mixes together two different questions: “Is this subgoal a good choice?” and “Given this subgoal, did I execute the action properly?” The agent thus learns to avoid good low‑level actions simply because they were performed under a bad high‑level plan. }
+
+
+
+
+We call this failure mode \textbf{intra-subgoal credit collapse}. It occurs when the global utility of a subgoal is inherited by every primitive action inside its execution segment. As a result, the executor may unlearn reusable skills simply because they were invoked under the wrong global plan. A robust hierarchical agent should instead separate strategic subgoal selection from tactical subgoal execution.
+
+%\wei{第三段，定义问题intra-subgoal credit collapse。这段前面写的也不错，最后一句有些凝练了，你现在的写作风格，是只能给熟悉你这个方案或者小同行的人看懂，写文章的目标是所有大同行看到都一下子能明白你的动机，尤其引言部分。然后又觉得你想到的创新点，是他们没想到的，不容易想的，这种效果是最好。We call this failure mode \textbf{intra-subgoal credit collapse: the global utility of a subgoal is inherited by every primitive action inside its execution segment. Consequently, the executor may unlearn reusable skills simply because they were invoked under a wrong global plan. A robust hierarchical agent therefore requires not only a hierarchical decomposition of decisions, but also a credit assignment mechanism that judges subgoal selection and action execution independently.}
+
+Recent methods make progress toward this goal. HiPER~\cite{hiper} exposes online Plan-Execute decisions. GiGPO~\cite{gigpo} constructs step-level groups from repeated environment states across trajectories. while HGPO~\cite{hgpo} highlights the importance of historical-context consistency in grouped policy optimization. These ideas address important aspects of long-horizon credit assignment, but they do not fully resolve intra-subgoal credit collapse: state-level grouping ignores the active subgoal, segment-level returns can still punish all actions in a bad subgoal, and branching alone does not define a subgoal-grounded process signal.
+%\wei{第四段，先前工作和缺陷。这段写作问题就比较明显了，讲完别人的进展，戛然而止了，中间少了一段关键的解释，为什么他们不好，分析的比较浅，这里我等下看看补充一段。另外，这一段也介绍一下GRPO吧，还有HiPER这种介绍太短了，然后这段的最后一句的总结，看起来不太好直接和前面几个方法存在的问题很直观的呼应，得读半天才对得上。冒号这种表达，除了你定义credit collapse那里可以用一下，尽量不要使用，最好每个方法存在的缺陷，直接接着这个方法讲一下就行，下面我新增加的这一段再总结性的表达。}
+
+\wei{这里补充第五段，承上启下。More generally, prior hierarchical RL for LLM agents either derives low‑level credit from segment‑level returns, which propagates the global subgoal utility to every action, or relies on outcome‑based reward redistribution that does not break dependency on final success. Group‑based estimators such as GRPO \cite{} and GiGPO eliminate the value critic but still compare actions using trajectory outcomes or state‑level anchors, without conditioning on the active subgoal. Thus, a locally correct action that advances a temporarily active but globally harmful subgoal still receives negative credit, and the executor unlearns a reusable skill. This is precisely the intra‑subgoal credit collapse that our method is designed to resolve.}
+
+
+
+We propose \textbf{HSPO}, Hierarchical Subgoal-conditioned Process Optimization. HSPO uses an online Plan-Execute interface in which the policy emits
+\[
+\texttt{<switch>}q_t\texttt{</switch>}
+\texttt{<subgoal>}g_t\texttt{</subgoal>}
+\texttt{<action>}a_t\texttt{</action>}
+\]
+at every environment step. The switch span induces subgoal segmentation online; the subgoal span represents high-level intent; the action span executes the current subgoal. 
+
+The core of HSPO is \textbf{Anchored Branch Grouping} (ABG), a low-level group-construction mechanism. After collecting complete task rollouts, ABG scans all low-level decision points and groups transitions with the same task signature, state signature, and active subgoal instance. Naturally repeated anchors are reused directly, while sparse groups are selectively supplemented with one-step branched candidate actions. Each candidate transition is scored by a deterministic state-grounded milestone scorer that measures progress toward the active subgoal.
+
+HSPO routes different credit signals to different spans: high-level macro advantages update only \texttt{<subgoal>} tokens, low-level ABG advantages update only \texttt{<action>} tokens, and termination supervision updates only \texttt{<switch>} tokens. Thus, a planner can be penalized for selecting a globally harmful subgoal, while the executor can still be rewarded for actions that correctly implement that subgoal.
+
+%\wei{第六段，引出我们的方法，并详细展开介绍了，这里就是摘要的plus版本，越细致越好，然后最好的情况，可以配一个图，和前面举的那个例子一起，左边是clean a cup and place it in a cabinet分层动作演示，右边是我们的方法的几个创新点和解决后的大概预期效果。第六段把你这三段并到一起了，写的挺好，先这样并一下，分了123, 后续可以再微调一下表述：To resolve this collapse, we propose Hierarchical Subgoal-conditioned Process Optimization (\textbf{HSPO}). (1) HSPO uses an online Plan-Execute interface in which the policy emits \[\texttt{<switch>}q_t\texttt{</switch>}\texttt{<subgoal>}g_t\texttt{</subgoal>}\texttt{<action>}a_t\texttt{</action>}\] at every environment step. The switch span induces subgoal segmentation online; the subgoal span represents high-level intent; the action span executes the current subgoal. (2) The core of HSPO is \textbf{Anchored Branch Grouping} (ABG), a low-level group-construction mechanism. After collecting complete task rollouts, ABG scans all low-level decision points and groups transitions with the same task signature, state signature, and active subgoal instance. Naturally repeated anchors are reused directly, while sparse groups are selectively supplemented with one-step branched candidate actions. Each candidate transition is scored by a deterministic state-grounded milestone scorer that measures progress toward the active subgoal. (3) HSPO routes different credit signals to different spans: high-level macro advantages update only \texttt{<subgoal>} tokens, low-level ABG advantages update only \texttt{<action>} tokens, and termination supervision updates only \texttt{<switch>} tokens. Thus, a planner can be penalized for selecting a globally harmful subgoal, while the executor can still be rewarded for actions that correctly implement that subgoal.
+
+\wei{这里增加一个第七段，总结一下我们的方法的最终贡献。As a result, the planner can be discouraged from choosing a globally harmful subgoal, while the executor simultaneously preserves actions that correctly implement that subgoal. This resolves intra‑subgoal credit collapse because a locally correct action under a bad subgoal receives positive low‑level advantage, since it advances the subgoal’s internal progress, while the subgoal itself receives negative high‑level advantage, since it leads to overall task failure. The two signals are routed to disjoint token spans and do not interfere.}
+
+Our contributions are:
+\begin{itemize}
+    \item We identify \textbf{intra-subgoal credit collapse} as a distinct failure mode in long-horizon LLM-agent RL.
+    \item We introduce an online Plan-Execute formulation where \texttt{<switch>} decisions induce subgoal segments during interaction.
+    \item We propose \textbf{Anchored Branch Grouping} (ABG), which compares actions under shared task--state--subgoal anchors and supplements sparse groups with one-step branches.
+    \item We design deterministic state-grounded milestone scorers for subgoal-conditioned process feedback.
+    \item We combine high-level macro optimization, low-level ABG optimization, lagged switch supervision, and token-level credit routing in a unified hierarchical RL framework.
+\end{itemize}
+
+%\wei{这里通常是分三个点，是一个约定俗成的写法。我给整合一下，\item We identify and formalize \textbf{intra-subgoal credit collapse} as a distinct failure mode in long-horizon LLM-agent RL. \item \textbf{Anchored Branch Grouping} (ABG) with deterministic milestone scorers to provide subgoal‑grounded, one‑step process feedback. \item We introduce a \textbf{unified hierarchical RL framework} that decouples strategic subgoal selection from tactical execution via token‑level credit routing.
+
+
+\section{Related Work} \wei{Note: 我看最后引用的参考文献较少，这块可以让乐童帮着调研一些，多补充一些相关的工作进来}
+\label{sec:relwork}
+
+\textbf{LLM agents.}
+Large language models (LLMs) have been widely used as interactive decision-making agents across tool use, web navigation, embodied environments, software engineering, and open-ended games~\cite{yao2022react,shinn2023reflexion,wang2024voyager}. Early agents typically rely on frozen foundation models with carefully designed prompting, such as ReAct~\cite{yao2022react} and Reflexion~\cite{shinn2023reflexion}, often augmented with memory, retrieval, or external tools. While these methods are flexible, flat autoregressive generation entangles high-level intent and low-level execution in a single token stream, making long-horizon behavior vulnerable to cascading errors. Recent work therefore explores structured agent interfaces \cite{xxx,yyy}, supervised fine-tuning \cite{xxx,yyy}, and reinforcement learning \cite{xxx,yyy} to improve multi-step decision-making. HSPO follows this direction by exposing termination, subgoal selection, and action execution through an online Plan-Execute interface.
+%\wei{相关工作这里写得还不错，但是我考虑这三个分类方式是不是有些太宽泛了，llm agent，rl for llm和hrl。这部分是全文最不重要的部分，可以先这样，最后再处理。}}
+
+
+\textbf{RL for LLM agents.}
+RL has become an important paradigm for adapting LLM agents from environment feedback. Classical actor-critic methods such as PPO~\cite{schulman2017ppo} have been applied to embodied and web-based agents, but learning accurate value functions over high-dimensional language-conditioned states is difficult under sparse rewards. Critic-free group-based objectives, including RLOO~\cite{ahmadian2024back}, GRPO~\cite{shao2024deepseekmath}, and DAPO~\cite{yu2025dapo}, reduce this burden by estimating relative advantages within sampled groups. Recent agentic RL methods further improve credit assignment in multi-turn settings. GiGPO~\cite{gigpo} constructs step-level groups from repeated environment states across rollouts; and HGPO~\cite{hgpo} addresses historical-context inconsistency in grouped policy optimization. These methods provide denser or more reliable update signals, but they generally compare actions at the state or trajectory level without explicitly conditioning low-level credit on the active subgoal. HSPO instead constructs action groups under shared task--state--subgoal anchors and scores one-step progress toward the current subgoal.
+
+\textbf{Hierarchical reinforcement learning.}
+Hierarchical RL addresses long-horizon decision-making through temporal abstraction. Classical frameworks such as \gx{options~\cite{sutton1999between} [这个名字有些歧义，注意形象化的名字]} and feudal reinforcement learning~\cite{vezhnevets2017feudal} decompose behavior into high-level goal selection and low-level action execution. Recent LLM-agent methods adapt this idea to natural language. HiPER~\cite{hiper} performs online subgoal segmentation during interaction, enabling hierarchical credit assignment over dynamically induced segments. HiMAC~\cite{himac} decomposes long-horizon behavior into macro-level planning and micro-level execution over natural-language goals or blueprints. These works show the benefit of explicit hierarchy, but low-level actions may still receive credit derived from segment-level or trajectory-level outcomes. HSPO targets this gap: it separates strategic subgoal credit from tactical execution credit through ABG, deterministic state-grounded milestone scoring, and token-level credit routing, so that the planner can learn which subgoals to avoid while the executor preserves actions that correctly implement those subgoals.
+
+
+\section{Method}
+\label{sec:method}
+HSPO aims to separate two forms of credit that are entangled in flat long-horizon agent RL: whether a subgoal should be selected for the global task, and whether a primitive action correctly executes the active subgoal. This section presents the full method. We first formulate the online Plan-Execute interface, then introduce the state-grounded process scorer, the Anchored Branch Grouping (ABG) low-level objective, and the high-level and termination objectives. Finally, we describe token-level credit routing and the staged training procedure.  %\wei{这段写得很好}
+\subsection{Problem Formulation} %\wei{3.1很好，没发现问题}
+\label{sec:problem_formulation}
+
+We consider an interactive language-agent environment. A task instruction $x \sim \mathcal{D}$ is sampled from a task distribution. At each environment step $t$, the agent observes a state $s_t$, generates a structured response $y_t$, executes a primitive action $a_t$, and transitions to the next state $s_{t+1}$. The environment provides sparse feedback, with the main task reward $R_{\mathrm{task}}$ typically observed only at the end of the episode.
+
+HSPO uses an online Plan-Execute interface and constrains each response to three structured fields:
+\begin{equation}
+\begin{aligned}
+y_t
+=
+\langle q_t,g_t,a_t\rangle
+=
+&\ \texttt{<switch>}q_t\texttt{</switch>}
+\texttt{<subgoal>}g_t\texttt{</subgoal>} \\
+&\ \texttt{<action>}a_t\texttt{</action>}.
+\end{aligned}
+\label{eq:response}
+\end{equation}
+Here, $q_t \in \{\mathsf{Keep}, \mathsf{Switch}\}$ is the termination decision, $g_t$ is the active natural-language subgoal, and $a_t$ is the primitive environment action. If $q_t=\mathsf{Keep}$, the agent continues executing the current subgoal. If $q_t=\mathsf{Switch}$, the model initiates a new subgoal.
+
+Let $0=b_0<b_1<\cdots<b_K\leq T$ denote the time indices at which new subgoals are initiated. These switch points induce a sequence of subgoal segments. The $k$-th segment is
+\begin{equation}
+\tau_k
+=
+(s_{b_k},a_{b_k},s_{b_k+1},\ldots,a_{b_{k+1}-1},s_{b_{k+1}}),
+\label{eq:segment}
+\end{equation}
+with active subgoal $g_k$. Thus, the trajectory is decomposed online into temporally extended subgoal-conditioned execution segments.
+
+Although a single autoregressive LLM $\pi_\theta$ emits all tokens in $y_t$, we conceptually factor the policy into three decision channels for credit-assignment purposes:
+\begin{equation}
+\pi_\theta^T(q_t \mid x,s_t,g_{t-1},h_t),\quad
+\pi_\theta^H(g_t \mid x,s_t,h_t),\quad
+\pi_\theta^L(a_t \mid x,s_t,g_t,h_t),
+\label{eq:factorization}
+\end{equation}
+where $h_t$ denotes a compact interaction history. The superscripts $T$, $H$, and $L$ correspond to termination, high-level subgoal selection, and low-level action execution, respectively. This factorization is used only to define losses and token-level credit routing during training; at inference time, HSPO remains a single online autoregressive agent.
+
+%！！！加一个overview的图【图2-Architectural Overview】
+
+
+\subsection{Plan-Execute Supervised Warm-up} %\wei{3.2也很好，没发现问题，你很擅长写比较细的方案}
+
+HSPO begins with a lightweight supervised warm-up that teaches the model to produce stable structured outputs before RL. Successful demonstration trajectories are converted into step-level Plan-Execute targets. When environment-provided subgoal annotations are available, they are used to define segment boundaries. Otherwise, a constrained segmenter maps the trajectory to a finite canonical subgoal vocabulary $\Sigma$. Unconstrained free-form segmentation is avoided because inconsistent subgoal vocabulary makes the process scorer and ABG anchors unreliable.
+
+For each step $t\in[b_k,b_{k+1})$, the target response is
+\begin{equation}
+y_t =
+\texttt{<switch>}q_t\texttt{</switch>}
+\texttt{<subgoal>}g_k\texttt{</subgoal>}
+\texttt{<action>}a_t\texttt{</action>},
+\end{equation}
+where $q_{b_k}=\mathsf{SWITCH}$ and $q_t=\mathsf{KEEP}$ for $t>b_k$. The supervised objective is a standard behavior-cloning loss, i.e., next-token negative log-likelihood on demonstration responses:
+\begin{equation}
+\mathcal{L}_{\mathrm{SFT}}(\theta)
+=
+-\mathbb{E}_{(c,y)}
+\sum_i
+\log \pi_\theta(y_i\mid y_{<i},c),
+\label{eq:sft_loss}
+\end{equation}
+where $c$ denotes context. The SFT checkpoint provides a stable Plan-Execute interface and initializes all trainable Plan-Execute baselines.
+
+
+\subsection{State-Grounded Milestone Scorer} %\IrreversibleHarm
+% 这里待会还再细化一下 OK 后面我一会再看，这个IrreversibleHarm有点怪，是自己起的名字吗，看看能不能换个词，或者解释一下。
+The low-level executor should be evaluated by whether its action progresses toward the active subgoal, not by whether the parent subgoal is globally useful. We therefore define a deterministic state-grounded scorer:
+\begin{equation}
+\begin{aligned}
+S(x,g,s,a,s')
+=
+&\ \Delta P_g(s,a,s')
++ \eta_{\mathrm{done}}\mathbf{1}[D_g(s')]  \\
+&-\lambda_{\mathrm{inv}}\mathbf{1}[\mathrm{Invalid}(a,s)]
+-\lambda_{\mathrm{hard}}\mathbf{1}[\mathrm{IrreversibleHarm}(x,s,a,s')]
+-\lambda_{\mathrm{step}},
+\end{aligned}
+\label{eq:scorer}
+\end{equation}
+where $\Delta P_g(s,a,s')=P_g(s')-P_g(s)$ measures one-step progress toward subgoal $g$, $D_g(s')$ indicates subgoal completion, $\mathrm{Invalid}$ penalizes invalid actions, and $\mathrm{IrreversibleHarm}$ captures minimal executor-level safety violations. The final term is a small step cost.
+
+
+Each subgoal $g$ is parsed into a canonical type $\sigma=c(g)$ and instance slots $\zeta_g$ such as object, receptacle, tool, product attribute, or option. Progress is defined as
+\begin{equation}
+P_g(s)
+=
+\frac{\mathrm{rank}_{\sigma}(s;\zeta_g)}{n_{\sigma}}.
+\label{eq:progress}
+\end{equation}
+For example, for $g=$ ``clean the cup'', $\sigma=\mathsf{Clean}$ and $\zeta_g=\mathrm{cup}$:
+\begin{equation}
+\mathrm{rank}_{\mathsf{Clean}}(s;\mathrm{cup})
+=
+\begin{cases}
+0, & \text{cup not visible},\\
+1, & \text{cup visible},\\
+2, & \text{cup in inventory},\\
+3, & \text{cup in inventory and agent at sink basin},\\
+4, & \text{cup clean}.
+\end{cases}
+\label{eq:clean_rank}
+\end{equation}
+Analogous milestone functions are defined for other canonical subgoal types, such as \textsc{FindPick}, \textsc{Heat}, \textsc{Cool}, \textsc{Place}, \textsc{Search}, \textsc{Inspect}, and \textsc{Purchase}. This scorer provides dense partial credit for preparatory actions while remaining inspectable and deterministic.
+%\wei{\textsc{FindPick}这些大写的话，clean这个子目标类型也大写？}
+
+\subsection{Anchored Branch Grouping for Low-Level Optimization} %\wei{这一节是主要创新，看起来有一些长，影响理解，建议可以加几个小标题}
+
+The low-level executor should be optimized under a fixed active subgoal. A primitive action that is appropriate for one subgoal may be inappropriate for another, even under the same environment state. Therefore, HSPO constructs low-level comparison groups at the granularity of task--state--subgoal anchors.
+
+ABG is applied after collecting a batch of complete task rollouts. Each rollout may contain multiple online subgoal segments; ABG scans all low-level decision points inside these complete trajectories.
+
+For each transition $(s_t^{(i)},g_t^{(i)},a_t^{(i)},s_{t+1}^{(i)})$, ABG computes the anchor key
+\begin{equation}
+\kappa_t^{(i)}
+=
+(\kappa_x(x),\kappa_s(s_t^{(i)}),\kappa_g(g_t^{(i)})),
+\label{eq:anchor}
+\end{equation}
+where $\kappa_x$ is a task signature, $\kappa_s$ is a canonical state signature, and $\kappa_g$ is a subgoal-instance signature. The subgoal instance is necessary because the same state and action may have different meanings under different active subgoals.
+
+For each anchor $\kappa$, the natural group is
+\begin{equation}
+G^{\mathrm{nat}}(\kappa)
+=
+\{(s_i,a_i,s_i',\ell_i):\kappa_i=\kappa\},
+\label{eq:natural_group}
+\end{equation}
+where $\ell_i$ is the old-policy log probability of the action span. Let $K(\kappa)=|G^{\mathrm{nat}}(\kappa)|$.
+
+If the natural group is sufficiently large, it is used directly. If it is sparse, HSPO supplements it with one-step branched candidates. Let $K_{\min}$ be the minimum natural group size, $M_{\mathrm{target}}$ the target group size, and $B_{\max}$ the maximum branch budget per anchor. The number of branch candidates is
+\begin{equation}
+B(\kappa)
+=
+\begin{cases}
+0, & K(\kappa)\geq K_{\min},\\
+\min(M_{\mathrm{target}}-K(\kappa),B_{\max}), & K(\kappa)<K_{\min}.
+\end{cases}
+\label{eq:branch_budget}
+\end{equation}
+When $B(\kappa)>0$, HSPO restores a representative environment snapshot for anchor $\kappa$, samples $B(\kappa)$ actions from the old low-level policy under the same task, state, and active subgoal, and executes each for one environment step:
+
+
+%\wei{representative 是指的恢复到哪一个snapshot，有很多。还有这里分支采样，不使用ht的话，是否会有问题，这里我是不确定的。}
+
+
+\begin{equation}
+a_{\mathrm{br}}^{(j)}
+\sim
+\pi_{\theta_{\mathrm{old}}}^{L}(\cdot\mid x,s_\kappa,g_\kappa),
+\quad
+s_\kappa \xrightarrow{a_{\mathrm{br}}^{(j)}} s_{\mathrm{br}}^{\prime(j)}.
+\label{eq:branching}
+\end{equation}
+The final ABG group is
+\begin{equation}
+G^{\mathrm{ABG}}(\kappa)
+=
+G^{\mathrm{nat}}(\kappa)\cup G^{\mathrm{br}}(\kappa).
+\label{eq:abg_group}
+\end{equation}
+Groups of size one are excluded from the relative low-level objective. %\wei{这里加一句These transitions receive no low-level update from ABG, they may still be covered by other anchors or by the SFT loss. 解释那些transitions不参与更新可能引起的某些动作不被学习的问题，不会出现}
+
+
+Each group element is scored by the milestone scorer:
+\begin{equation}
+q_i = S(x,g_\kappa,s_i,a_i,s_i').
+\end{equation}
+The group-normalized low-level advantage is
+\begin{equation}
+A_i^L
+=
+\frac{q_i-\mu(q_{G^{\mathrm{ABG}}(\kappa)})}
+{\sigma(q_{G^{\mathrm{ABG}}(\kappa)})+\epsilon}.
+\label{eq:low_adv}
+\end{equation}
+The low-level objective is a clipped policy-gradient loss applied only to action tokens:
+\begin{equation}
+\mathcal{L}^L(\theta)
+=
+-\mathbb{E}_{\kappa,i}
+\left[
+\min
+\left(
+\rho_i^L A_i^L,\ 
+\mathrm{clip}(\rho_i^L,1-\epsilon,1+\epsilon)A_i^L
+\right)
+\right]
++
+\beta_L\mathrm{KL}(\pi_\theta^L\|\pi_{\mathrm{ref}}^L),
+\label{eq:low_loss}
+\end{equation}
+where
+\begin{equation}
+\rho_i^L
+=
+\frac{
+\pi_\theta^L(a_i\mid x,s_i,g_\kappa)
+}{
+\pi_{\theta_{\mathrm{old}}}^L(a_i\mid x,s_i,g_\kappa)
+}.
+\end{equation}
+
+\wei{$\pi_{\mathrm{ref}}^L$ denote the low-level policy after SFT warm-up phase}
+
+Branched candidates are used only to construct training advantages. The real rollout trajectory always advances with the on-policy action originally sampled during interaction, not with the highest-scoring candidate. This avoids using the scorer as an inference-time action selector and prevents train-test mismatch.
+
+\subsection{High-Level and Termination Objectives}
+
+The planner is updated only at subgoal boundaries. At boundary $b_k$, the model emits subgoal $g_k$, and the executor acts under this subgoal until the next boundary. The macro transition is $(s_{b_k},g_k,s_{b_{k+1}})$. We define the high-level reward as 
+
+\begin{equation}
+R_k^H
+=
+\mathbf{1}[k=K-1]R_{\mathrm{task}}
+-
+\beta C_{\mathrm{side}}(x,s_{b_k},s_{b_{k+1}})
+-
+\eta C_{\mathrm{red}}(g_k,h_{b_k}),
+\label{eq:high_reward}
+\end{equation}
+where $C_{\mathrm{side}}$ penalizes globally harmful state changes during the segment and $C_{\mathrm{red}}$ penalizes redundant subgoals. A macro critic $V^H$ estimates boundary-state values:
+\begin{equation}
+\delta_k^H
+=
+R_k^H+\gamma_H V^H(s_{b_{k+1}})-V^H(s_{b_k}),
+\quad
+A_k^H
+=
+\sum_{j=k}^{K-1}
+(\gamma_H\lambda_H)^{j-k}\delta_j^H.
+\label{eq:macro_gae}
+\end{equation}
+The planner loss is
+\begin{equation}
+\mathcal{L}^H(\theta)
+=
+-\mathbb{E}_k
+\left[
+\min
+\left(
+\rho_k^H A_k^H,\ 
+\mathrm{clip}(\rho_k^H,1-\epsilon,1+\epsilon)A_k^H
+\right)
+\right]
++
+\beta_H\mathrm{KL}(\pi_\theta^H\|\pi_{\mathrm{ref}}^H),
+\label{eq:high_loss}
+\end{equation}
+where
+\begin{equation}
+\rho_k^H
+=
+\frac{
+\pi_\theta^H(g_k\mid x,s_{b_k},h_{b_k})
+}{
+\pi_{\theta_{\mathrm{old}}}^H(g_k\mid x,s_{b_k},h_{b_k})
+}.
+\end{equation}
+This loss updates only subgoal tokens.
+
+%\wei{这地方两个loss之间加一点过渡性质的描述，Unlike the high‑level planner, which is updated via macro PPO over segment boundaries, the termination decision (the <switch> span) is trained with supervised lagged targets. This is because termination depends only on local subgoal completion, not on long‑horizon returns, and supervised learning is more stable when the executor is still unreliable.}
+
+
+The switch span is trained with lagged subgoal-completion supervision. If action $a_t$ completes the current subgoal, the next model call should switch; the completion action itself still belongs to the current segment. Thus,
+\begin{equation}
+y_{t+1}^T
+=
+\begin{cases}
+\mathsf{SWITCH}, & D_{g_t}(s_{t+1})=1,\\
+\mathsf{KEEP}, & D_{g_t}(s_{t+1})=0.
+\end{cases}
+\label{eq:switch_target}
+\end{equation}
+The termination loss is
+\begin{equation}
+\mathcal{L}^T(\theta)
+=
+-\mathbb{E}_t
+\log
+\pi_\theta^T(y_t^T\mid x,s_t,g_{t-1},h_t),
+\label{eq:switch_loss}
+\end{equation}
+applied only to switch tokens.
+
+\subsection{Token-Level Credit Masks and Total Objective}
+\label{sec:token_masks}
+
+HSPO is implemented with a single autoregressive LLM, but different parts of its structured response correspond to different decision levels. To prevent credit from one level from directly updating another, we apply token-level credit masks to the output spans. Let
+\begin{equation}
+m_i^T=\mathbf{1}[y_i\in \texttt{<switch>}],\quad
+m_i^H=\mathbf{1}[y_i\in \texttt{<subgoal>}],\quad
+m_i^L=\mathbf{1}[y_i\in \texttt{<action>}],
+\label{eq:token_masks}
+\end{equation}
+where $m_i^T$, $m_i^H$, and $m_i^L$ indicate whether token $y_i$ belongs to the termination, subgoal, or action span, respectively. Each objective is computed only over its corresponding span: high-level macro advantages update subgoal tokens, low-level ABG advantages update action tokens, and termination supervision updates switch tokens.
+
+Equivalently, for a response $y$, the masked log probabilities are
+\begin{equation}
+\begin{aligned}
+\log \pi_\theta^T(y) &= \sum_i m_i^T \log \pi_\theta(y_i\mid y_{<i},c), \\
+\log \pi_\theta^H(y) &= \sum_i m_i^H \log \pi_\theta(y_i\mid y_{<i},c), \\
+\log \pi_\theta^L(y) &= \sum_i m_i^L \log \pi_\theta(y_i\mid y_{<i},c).
+\end{aligned}
+\label{eq:masked_logprob}
+\end{equation}
+These masked log probabilities are used in the termination, high-level, and low-level losses introduced above. The masking does not create separate models; rather, it routes different learning signals to different output spans of the same model.
+
+However, token masks alone do not completely isolate the underlying parameters, since all spans are generated by a shared LLM. In particular, low-level action updates may still indirectly change the distribution of future subgoal tokens through shared representations. To reduce such planner drift during executor optimization, we regularize the subgoal-token distribution against the supervised Plan-Execute reference policy $\pi_{\mathrm{SFT}}$: %\wei{这里的$\pi_{\mathrm{SFT}}$应该就是前面没定义的$\pi_{\mathrm{ref}}^L$吧，前面我加了定义，如果是一个意思的话，就统一一下符号}
+\begin{equation}
+\mathcal{L}_{\mathrm{sgKL}}(\theta)
+=
+\mathbb{E}
+\left[
+\sum_i m_i^H
+\mathrm{KL}
+\left(
+\pi_\theta(\cdot\mid y_{<i},c)
+\|
+\pi_{\mathrm{SFT}}(\cdot\mid y_{<i},c)
+\right)
+\right].
+\label{eq:subgoal_kl}
+\end{equation}
+This term stabilizes subgoal generation while the executor is being optimized. It should be interpreted as distributional stabilization rather than strict parameter-level freezing.
+
+The final training objective combines high-level planning, low-level execution, termination learning, value learning, supervised regularization, and subgoal-distribution stabilization:
+\begin{equation}
+\mathcal{L}_{\mathrm{HSPO}}
+=
+\mathcal{L}^{H}
++
+\alpha_L \mathcal{L}^{L}
++
+\alpha_T \mathcal{L}^{T}
++
+\alpha_V \mathcal{L}_{V^H}
++
+\alpha_{\mathrm{SFT}}\mathcal{L}_{\mathrm{SFT}}
++
+\beta_{\mathrm{sg}}\mathcal{L}_{\mathrm{sgKL}}.
+\label{eq:total_loss}
+\end{equation}
+Here, $\mathcal{L}^{H}$ optimizes subgoal selection, $\mathcal{L}^{L}$ optimizes subgoal-conditioned action execution, $\mathcal{L}^{T}$ trains online subgoal termination, and $\mathcal{L}_{V^H}$ trains the macro critic. The SFT term preserves the structured Plan-Execute format, while the subgoal KL term reduces unintended drift of the planner during low-level updates.
+
+This objective realizes the desired credit separation. A subgoal can receive negative high-level advantage because it is globally harmful, while an action inside that segment can receive positive low-level advantage because it correctly advances the active subgoal. Since the two learning signals are applied to different output spans, HSPO can suppress harmful subgoal choices without erasing reusable executor skills.
+
+HSPO is trained with a staged optimization procedure. We first perform a lightweight Plan-Execute supervised warm-up to initialize the structured response format and basic execution behavior. We then construct and validate the state-grounded milestone scorer before RL. During low-level training, complete task rollouts are collected, ABG groups are built from task--state--subgoal anchors, sparse groups are supplemented with one-step branches, and action tokens are updated with the low-level objective; switch tokens are trained with lagged completion supervision, while subgoal-distribution regularization reduces unintended planner drift. Finally, after the executor and termination behavior are stabilized, the planner is optimized over macro transitions with the high-level objective and macro critic. The full pseudocode is provided in Appendix.
+%\wei{这一段略长，可以根据最后篇幅长度调整，凝练一些}
+
+
+%伪代码放附录2
+
+\section{Experiments}
+\label{sec:experiments}
+We evaluate HSPO with two goals. First, we test whether separating subgoal-level and action-level credit improves long-horizon task performance over flat and hierarchical RL baselines. Second, we directly examine the proposed failure mode, intra-subgoal credit collapse, by measuring whether the executor preserves locally correct skills even when their parent subgoals are globally suboptimal. Our experiments therefore include both standard task-level metrics and targeted diagnostics for subgoal execution, scorer quality, anchor validity, and training cost.
+
+\label{sec:exp}
+\subsection{Experimental Setup} \wei{实验设置这里你应该还没写完，还需要补充软硬件条件，附录中可以详细展开，这里按惯例也要提一句。然后提及baseline的实现细节在附录中展示，}
+
+\textbf{Benchmarks.} We evaluate on two long-horizon agent benchmarks. \textbf{ALFWorld} \cite{shridhar2021alfworld} is a text-based embodied household environment with 6 task categories (Pick \& Place, Examine in Light, Clean \& Place, Heat \& Place, Cool \& Place, Pick Two \& Place), evaluated on 134 unseen test instances. \textbf{WebShop} \cite{yao2022webshop} is a simulated e-commerce environment requiring product search, attribute matching, and option selection over up to 15 turns, evaluated on 500 test instructions.
+
+\textbf{Models.} Following \cite{NEURIPS2025_420c9f77}, we use Qwen2.5-1.5B-Instruct and Qwen2.5-7B-Instruct as the base models. The same SFT checkpoint initializes HSPO and all RL baselines.
+
+\textbf{Baselines.} We compare against \textbf{SFT only} (warm-up without RL), \textbf{PPO} with a learned value critic \cite{schulman2017proximal}, trajectory-level \textbf{GRPO} [4], \textbf{GiGPO} \cite{NEURIPS2025_420c9f77} (episode- and step-level group advantages with anchor states), and our method. For a prompt-based reference, we report \textbf{ReAct} \cite{yao2022react} with GPT-4o under the same evaluation protocol.
+
+\textbf{Hyperparameters.} Following \cite{NEURIPS2025_420c9f77}, the actor learning rate is $1{\times}10^{-6}$ and critic learning rate (where applicable) is $1{\times}10^{-5}$. Maximum prompt length is 4096, response length 512. Maximum episode length is 50 steps for ALFWorld and 15 for WebShop. The GRPO/HSPO group size is 8 trajectories, and HSPO branch size is $M = 4$. Mini-batch size 256, KL coefficient 0.01. Rollout temperature 1.0, evaluation temperature 0.4. We train for 150 RL steps (Phase III) followed by 100 macro-PPO steps (Phase IV). HSPO loss coefficients are $\alpha_L = 1.0$, $\alpha_T = 0.5$, $\alpha_V = 0.5$, $\alpha_{\text{SFT}} = 0.1$, $\beta_L = \beta_H = 0.01$.
+
+\textbf{Metrics.} For ALFWorld, we report the success rate (fraction of tasks completed within 50 steps) and progress rate using AgentBoard \cite{ma2024agentboard} subgoal annotations. For WebShop, we report task score (the official 0--100 attribute-match score) and success rate (score = 100). All numbers are averaged over 3 random seeds; standard deviations are reported in parentheses where space permits. %\gx{3 random seed}
+
+\begin{table*}[t]
+\centering
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.1}
+\resizebox{\textwidth}{!}{
+\begin{tabular}{ll|ccccccc|cc}
+\toprule
+\multicolumn{2}{c|}{\textbf{Type / Method}} 
+& \multicolumn{7}{c|}{\textbf{ALFWorld}} 
+& \multicolumn{2}{c}{\textbf{WebShop}} \\
+\cmidrule(lr){3-9} \cmidrule(l){10-11}
+& & \textbf{Pick} & \textbf{Look} & \textbf{Clean} & \textbf{Heat} & \textbf{Cool} & \textbf{Pick2} & \textbf{All} & \textbf{Score} & \textbf{Succ.} \\
+\midrule
+PE & ReAct      & [ ] & [ ] & [ ] & [ ] & [ ] & [ ] & [ ] & [ ] & [ ] \\
+PE & Reflexion  & [ ] & [ ] & [ ] & [ ] & [ ] & [ ] & [ ] & [ ] & [ ] \\
+RL & PPO        & [ ] & [ ] & [ ] & [ ] & [ ] & [ ] & [ ] & [ ] & [ ] \\
+RL & RLOO       & [ ] & [ ] & [ ] & [ ] & [ ] & [ ] & [ ] & [ ] & [ ] \\
+RL & GRPO       & [ ] & [ ] & [ ] & [ ] & [ ] & [ ] & [ ] & [ ] & [ ] \\
+RL & GiGPO      & [ ] & [ ] & [ ] & [ ] & [ ] & [ ] & [ ] & [ ] & [ ] \\
+RL & \textbf{HSPO (Ours)} 
+               & \textbf{[ ]} & \textbf{[ ]} & \textbf{[ ]} & \textbf{[ ]} & \textbf{[ ]} & \textbf{[ ]} & \textbf{[ ]} & \textbf{[ ]} & \textbf{[ ]} \\
+\bottomrule
+\end{tabular}
+}
+\caption{\textbf{Main results on ALFWorld and WebShop.} 
+ALFWorld results are reported by task type and overall average. 
+WebShop results are reported with task score and exact success rate.}
+\label{tab:main_results_single}
+\end{table*}
+
+\subsection{Main Results}
+\label{sec:main_results}
+
+Table~\ref{tab:main_results} presents the main results on ALFWorld and WebShop. HSPO consistently outperforms all baselines across both environments and model scales.
+
+On ALFWorld, HSPO achieves the highest overall success rate (\textbf{All}) and improves performance across all task types. Compared to flat RL methods such as PPO, RLOO, and GRPO, HSPO shows substantial gains on long-horizon tasks such as \textit{Clean}, \textit{Heat}, and \textit{Cool}, where correct execution requires multi-step subgoal completion. Compared to step-level grouping methods, HSPO further improves stability and performance, indicating that subgoal-conditioned credit assignment provides a more precise training signal than state-only grouping.
+
+On WebShop, HSPO improves both task score and success rate. The improvement is particularly pronounced in scenarios that require multi-step interaction (search $\rightarrow$ inspect $\rightarrow$ purchase), suggesting that HSPO better preserves intermediate decision quality under sparse rewards.
+
+These results demonstrate that decoupling subgoal selection and execution leads to consistent improvements in long-horizon agent performance.
+
+\subsection{Analysis of Intra-Subgoal Credit Collapse}
+\label{sec:credit_analysis}
+
+We evaluate whether HSPO mitigates intra-subgoal credit collapse by measuring \textbf{executor preservation}. Specifically, we identify subgoal segments that are globally suboptimal but contain locally correct actions, and measure whether these actions are preserved after training.
+
+Flat RL baselines exhibit significant degradation: actions that correctly implement a subgoal are penalized when the subgoal is globally harmful. In contrast, HSPO maintains a high preservation rate, indicating that low-level policies are updated according to subgoal-conditioned progress rather than trajectory-level outcomes.
+
+We further analyze subgoal selection behavior. HSPO reduces the frequency of globally harmful subgoals while maintaining or improving execution quality within valid subgoals. This confirms that high-level and low-level policies are effectively decoupled.
+
+\subsection{Ablation Studies}
+\label{sec:ablation}
+
+We perform ablations to evaluate the contribution of each component in HSPO.
+
+\textbf{(1) Removing ABG.}
+We replace ABG with trajectory-level or segment-level credit assignment. Performance drops significantly, especially on long-horizon tasks, indicating that local action comparison is critical for stable learning.
+
+\textbf{(2) Removing milestone scorer.}
+We replace the deterministic scorer with trajectory-level rewards. This leads to unstable training and reduced performance, confirming that state-grounded process signals are essential.
+
+\textbf{(3) Removing token-level credit routing.}
+We apply a unified loss over all tokens. This degrades both subgoal selection and execution quality, demonstrating that separating credit across decision levels is necessary.
+
+\textbf{(4) No-branch mode.}
+We disable branching and use only naturally occurring anchor groups. Performance degrades moderately, showing that branching improves data efficiency, especially when anchor coverage is sparse.
+
+Overall, each component contributes to the final performance, and their combination yields the best results.
+
+\subsection{Efficiency and Cost Analysis}
+\label{sec:efficiency}
+
+We analyze the computational cost of HSPO by separating real environment interactions and additional one-step branch evaluations.
+
+Compared to flat RL methods, HSPO introduces additional cost due to branching. However, this cost is bounded and controllable through the target group size $M_{\mathrm{target}}$ and maximum branching budget $B_{\max}$. In practice, most groups are constructed from naturally repeated anchors, and branching is only applied to sparse regions.
+
+We report cost-adjusted performance by normalizing task success with total environment-equivalent steps. HSPO achieves higher performance under comparable or lower effective cost than baselines, demonstrating improved sample efficiency.
+
+\subsection{Scorer Validation}
+\label{sec:scorer}
+
+We evaluate the quality of the milestone scorer by measuring its alignment with true subgoal progress.
+
+For each environment, we compute the correlation between scorer outputs and manually verified subgoal completion signals. The deterministic scorer shows high alignment, indicating that it provides reliable process-level supervision.
+
+We also evaluate robustness by testing scorer behavior under off-distribution states. Unlike learned reward models, the rule-based scorer exhibits stable behavior and avoids reward hacking.
+
+\subsection{Qualitative Analysis}
+\label{sec:qualitative}
+
+We provide qualitative examples illustrating the behavior of HSPO.
+
+In ALFWorld, when the agent selects an incorrect subgoal, HSPO reduces the probability of repeating that subgoal in future episodes while preserving actions that correctly execute it under appropriate contexts. In WebShop, HSPO improves consistency across multi-step interaction sequences, reducing error accumulation.
+
+These examples highlight that HSPO enables more robust hierarchical behavior by separating planning and execution.
+
+
+
+\bibliographystyle{unsrt}
+\bibliography{Ref}
+
+\appendix %\wei{附录补充prompt格式举例、算法、如果有信用坍塌的验证或者一定的理论证明更好、还有较完整的超参数表}
+
+\section{Full Milestone Rank Definitions}
+
+\subsection{ALFWorld}
+
+\textbf{FindPick.} $\mathrm{rank}(s) \in \{0, 1, 2\}$: 0 if the target object's containing receptacle has not been opened or examined; 1 if the target object is visible (i.e., its location is observable); 2 if the target object is in the agent's inventory.
+
+\textbf{Clean.} Defined in Eq.~(5).
+
+\textbf{Heat.} $\mathrm{rank}(s) \in \{0, 1, 2, 3, 4\}$: 0 target not visible, 1 target visible, 2 target in inventory, 3 target in inventory and agent at microwave, 4 target heated.
+
+\textbf{Cool.} $\mathrm{rank}(s) \in \{0, 1, 2, 3, 4\}$: analogous to Heat but with fridge and cool state.
+
+\textbf{Place.} $\mathrm{rank}(s) \in \{0, 1, 2, 3\}$: 0 target not held, 1 target in inventory, 2 target in inventory and target receptacle visible, 3 target placed in target receptacle.
+
+\textbf{Examine.} $\mathrm{rank}(s) \in \{0, 1, 2, 3\}$: 0 target not visible, 1 target visible, 2 target in inventory and light source visible, 3 target examined in light (light on, target held in the light source's vicinity).
+
+\subsection{WebShop}
+
+\textbf{Search.} $\mathrm{rank}(s) \in \{0, 1, 2\}$: 0 no search performed, 1 search performed but query coverage of required attributes $< 50\%$, 2 search performed with $\geq 50\%$ coverage.
+
+\textbf{Inspect.} $\mathrm{rank}(s) \in \{0, 1, 2\}$: 0 no product clicked, 1 product clicked, 2 product clicked and detail page reached.
+
+\textbf{SelectOption.} $\mathrm{rank}(s) \in \{0, 1, 2, 3\}$: 0 no options selected, 1 some options selected, 2 all required options selected, 3 all options match goal attributes.
+
+\textbf{Purchase.} $\mathrm{rank}(s) \in \{0, 1, 2\}$: 0 not at purchase page, 1 at purchase page, 2 purchase confirmed.
+
+\section{Hyperparameters and Implementation Details}
+
+A full table with seed values, batch composition, learning rate schedule, and gradient clipping thresholds will be added in the final version.
+
+\section{Computational Cost}
+
+A wall-clock cost analysis comparing HSPO full / degraded mode against all baselines on a single A100 / H100 node will be added in the final version. Branch cost is bounded by $M \times$ environment-step time and is typically an order of magnitude smaller than the LLM forward-pass time per step, so the total HSPO overhead is dominated by the additional gradient terms from $M-1$ extra candidate-action advantages per step.
+
+\newpage
+\input{checklist.tex}
+
+\end{document}

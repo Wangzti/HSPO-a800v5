@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/mnt/nfs/ztwang/conda_envs/verl/bin/python -m pytest -x tests/sanity/ -q)",
+      "Bash(/mnt/nfs/ztwang/conda_envs/verl-webshop/bin/python -m pytest -x tests/sanity/ -q --no-header)",
+      "Bash(/mnt/nfs/ztwang/conda_envs/verl-webshop/bin/python *)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('keys:', list\\(d.keys\\(\\)\\)\\); print\\('turk_annotations.keys:', list\\(d['turk_annotations']['anns'][0].keys\\(\\)\\) if 'turk_annotations' in d else 'N/A'\\); print\\('plan.keys:', list\\(d.get\\('plan',{}\\).keys\\(\\)\\) if 'plan' in d else 'N/A'\\); print\\('plan.high_pddl sample:', d['plan']['high_pddl'][:3] if 'plan' in d else 'N/A'\\)\")",
+      "Bash(python3 -c ' *)",
+      "Bash(/mnt/nfs/ztwang/conda_envs/verl-webshop/bin/pytest tests/sanity/test_hspo_parser.py tests/sanity/test_hspo_advantages.py tests/sanity/test_hspo_prm.py -v)",
+      "Bash(/mnt/nfs/ztwang/conda_envs/verl-webshop/bin/pytest *)"
+    ]
+  }
+}

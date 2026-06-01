@@ -1,0 +1,5 @@
+#anchors=20535
+singleton_pct=94.06
+anchor_cov_before=5.94
+trans_cov_before=20.96
+extra_branches=77260

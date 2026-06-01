@@ -1,0 +1,12 @@
+num_trajectories=2012
+Pick: n=713, mean_steps=8.92, mean_subgoals=4.00
+Look: n=239, mean_steps=8.82, mean_subgoals=3.71
+Clean: n=390, mean_steps=14.81, mean_subgoals=5.95
+Heat: n=293, mean_steps=16.36, mean_subgoals=5.91
+Cool: n=377, mean_steps=14.32, mean_subgoals=5.94
+scorer_FindPick: pos=494, nonpos=1610, AUROC=0.9984
+scorer_Clean: pos=17, nonpos=554, AUROC=0.9749
+scorer_Heat: pos=33, nonpos=1851, AUROC=0.7615
+scorer_Cool: pos=25, nonpos=1797, AUROC=0.9603
+scorer_Place: pos=23, nonpos=1551, AUROC=0.9870
+scorer_Examine: pos=1, nonpos=230, AUROC=1.0000
